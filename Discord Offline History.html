@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Discord Offline History</title>
+    
+    <script type="text/javascript">
+var DISCORD=function(){function isImageAttachment(attachment){var ext=attachment.url.lastIndexOf(".");return".png"===(ext=-1===ext?"":attachment.url.substring(ext).toLowerCase())||".gif"===ext||".jpg"===ext||".jpeg"===ext}function getHumanReadableTime(date){return(date=new Date(date)).toLocaleDateString()+", "+date.toLocaleTimeString()}function processMessageContents(animatedEmojiExtension){var escapeHtmlMatch,processed=DOM.escapeHTML(animatedEmojiExtension.replace(REGEX_formatUrlNoEmbed,"$1"));return STATE.settings.enableFormatting&&(escapeHtmlMatch=(full,match)=>"&#"+match.charCodeAt(0)+";",processed=processed.replace(REGEX_specialEscapedBacktick,"&#96;").replace(REGEX_formatCodeBlock,(full,ignore,match)=>"<code class='block'>"+match.replace(REGEX_specialUnescaped,escapeHtmlMatch)+"</code>").replace(REGEX_formatCodeInline,(full,ignore,match)=>"<code class='inline'>"+match.replace(REGEX_specialUnescaped,escapeHtmlMatch)+"</code>").replace(REGEX_specialEscapedSingle,escapeHtmlMatch).replace(REGEX_specialEscapedDouble,full=>full.replace(/\\/g,"").replace(/(.)/g,escapeHtmlMatch)).replace(REGEX_formatBold,"<b>$1</b>").replace(REGEX_formatItalic1,"<i>$1</i>").replace(REGEX_formatItalic2,"<i>$1</i>").replace(REGEX_formatUnderline,"<u>$1</u>").replace(REGEX_formatStrike,"<s>$1</s>")),animatedEmojiExtension=STATE.settings.enableAnimatedEmoji?"gif":"png","<p>"+(processed=processed.replace(REGEX_formatUrl,"<a href='$1' target='_blank' rel='noreferrer'>$1</a>").replace(REGEX_mentionChannel,(full,match)=>"<span class='link mention-chat'>#"+STATE.getChannelName(match)+"</span>").replace(REGEX_mentionUser,(full,match)=>"<span class='link mention-user' title='#"+(STATE.getUserTag(match)||"????")+"'>@"+STATE.getUserName(match)+"</span>").replace(REGEX_customEmojiStatic,"<img src='https://cdn.discordapp.com/emojis/$2.png' alt=':$1:' title=':$1:' class='emoji'>").replace(REGEX_customEmojiAnimated,"<img src='https://cdn.discordapp.com/emojis/$2."+animatedEmojiExtension+"' alt=':$1:' title=':$1:' class='emoji'>"))+"</p>"}var templateChannelServer,templateChannelPrivate,templateMessageNoAvatar,templateMessageWithAvatar,templateUserAvatar,templateEmbedImage,templateEmbedRich,templateEmbedRichNoDescription,templateEmbedRichUnsupported,templateEmbedDownload,REGEX_formatBold=/\*\*([\s\S]+?)\*\*(?!\*)/g,REGEX_formatItalic1=/\*([\s\S]+?)\*(?!\*)/g,REGEX_formatItalic2=/_([\s\S]+?)_(?!_)\b/g,REGEX_formatUnderline=/__([\s\S]+?)__(?!_)/g,REGEX_formatStrike=/~~([\s\S]+?)~~(?!~)/g,REGEX_formatCodeInline=/(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/g,REGEX_formatCodeBlock=/```(?:([A-z0-9\-]+?)\n+)?\n*([^]+?)\n*```/g,REGEX_formatUrl=/(\b(?:https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi,REGEX_formatUrlNoEmbed=/<(\b(?:https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])>/gi,REGEX_specialEscapedBacktick=/\\`/g,REGEX_specialEscapedSingle=/\\([*\\])/g,REGEX_specialEscapedDouble=/\\__|_\\_|\\_\\_|\\~~|~\\~|\\~\\~/g,REGEX_specialUnescaped=/([*_~\\])/g,REGEX_mentionUser=/&lt;@!?(\d+?)&gt;/g,REGEX_mentionChannel=/&lt;#(\d+?)&gt;/g,REGEX_customEmojiStatic=/&lt;:([^:]+):(\d+?)&gt;/g,REGEX_customEmojiAnimated=/&lt;a:([^:]+):(\d+?)&gt;/g;return{setup:function(){templateChannelServer=new TEMPLATE(["<div data-channel='{id}'>","<div class='info' title='{topic}'><strong class='name'>#{name}</strong>{nsfw}<span class='tag'>{msgcount}</span></div>","<span class='server'>{server.name} ({server.type})</span>","</div>"].join("")),templateChannelPrivate=new TEMPLATE(["<div data-channel='{id}'>","<div class='info'><strong class='name'>{name}</strong><span class='tag'>{msgcount}</span></div>","<span class='server'>({server.type})</span>","</div>"].join("")),templateMessageNoAvatar=new TEMPLATE(["<div>","<div class='reply-message'>{reply}</div>","<h2><strong class='username' title='#{user.tag}'>{user.name}</strong><span class='info time'>{timestamp}</span>{edit}{jump}</h2>","<div class='message'>{contents}{embeds}{attachments}</div>","<div class='reactions'>{reactions}</div>","</div>"].join("")),templateMessageWithAvatar=new TEMPLATE(["<div>","<div class='reply-message reply-message-with-avatar'>{reply}</div>","<div class='avatar-wrapper'>","<div class='avatar'>{avatar}</div>","<div>","<h2><strong class='username' title='#{user.tag}'>{user.name}</strong><span class='info time'>{timestamp}</span>{edit}{jump}</h2>","<div class='message'>{contents}{embeds}{attachments}</div>","<div class='reactions'>{reactions}</div>","</div>","</div>","</div>"].join("")),templateUserAvatar=new TEMPLATE(["<img src='https://cdn.discordapp.com/avatars/{id}/{path}.webp?size=128'>"].join("")),templateEmbedImage=new TEMPLATE(["<a href='{url}' class='embed thumbnail'><img src='{url}' alt='(image attachment not found)'></a><br>"].join("")),templateEmbedRich=new TEMPLATE(["<div class='embed download'><a href='{url}' class='title'>{t}</a><p class='desc'>{d}</p></div>"].join("")),templateEmbedRichNoDescription=new TEMPLATE(["<div class='embed download'><a href='{url}' class='title'>{t}</a></div>"].join("")),templateEmbedRichUnsupported=new TEMPLATE(["<div class='embed download'><p>(Formatted embeds are currently not supported)</p></div>"].join("")),templateEmbedDownload=new TEMPLATE(["<a href='{url}' class='embed download'>Download {filename}</a>"].join("")),templateReaction=new TEMPLATE(["<span class='reaction-wrapper'><span class='reaction-emoji'>{n}</span><span class='count'>{c}</span></span>"].join("")),templateReactionCustom=new TEMPLATE(["<span class='reaction-wrapper'><img src='https://cdn.discordapp.com/emojis/{id}.{ext}' alt=':{n}:' title=':{n}:' class='reaction-emoji-custom'><span class='count'>{c}</span></span>"].join(""))},isImageAttachment:isImageAttachment,getChannelHTML:function(channel){return("SERVER"===channel.server.type?templateChannelServer:templateChannelPrivate).apply(channel,(property,value)=>{if("server.type"===property)switch(value){case"SERVER":return"server";case"GROUP":return"group";case"DM":return"user"}else if("nsfw"===property)return value?"<span class='tag'>NSFW</span>":""})},getMessageHTML:function(message){return(STATE.settings.enableUserAvatars?templateMessageWithAvatar:templateMessageNoAvatar).apply(message,(contents,value)=>{if("avatar"===contents)return value?templateUserAvatar.apply(value):"";if("user.tag"===contents)return value||"????";if("timestamp"===contents)return getHumanReadableTime(value);if("contents"===contents)return null==value||0===value.length?"":processMessageContents(value);if("embeds"===contents)return value?value.map(embed=>{switch(embed.type){case"image":return STATE.settings.enableImagePreviews?templateEmbedImage.apply(embed):"";case"rich":return(embed.t?embed.d?templateEmbedRich:templateEmbedRichNoDescription:templateEmbedRichUnsupported).apply(embed)}}).join(""):"";if("attachments"===contents)return value?value.map(attachment=>{if(isImageAttachment(attachment)&&STATE.settings.enableImagePreviews)return templateEmbedImage.apply(attachment);var sliced=attachment.url.split("/");return templateEmbedDownload.apply({url:attachment.url,filename:sliced[sliced.length-1]})}).join(""):"";if("edit"===contents)return value?"<span class='info edited'>Edited"+(1<value?" "+getHumanReadableTime(value):"")+"</span>":"";if("jump"===contents)return STATE.hasActiveFilter?"<span class='info jump' data-jump='"+value+"'>Jump to message</span>":"";if("reply"!==contents)return"reactions"===contents?null===value?"":value.map(reaction=>"id"in reaction?(reaction.ext=reaction.an&&STATE.settings.enableAnimatedEmoji?"gif":"png",templateReactionCustom.apply(reaction)):templateReaction.apply(reaction)).join(""):void 0;if(null===value)return"";var user="<span class='reply-username' title='#"+(value.user.tag||"????")+"'>"+value.user.name+"</span>",avatar=STATE.settings.enableUserAvatars&&value.avatar?"<span class='reply-avatar'>"+templateUserAvatar.apply(value.avatar)+"</span>":"",contents=value.contents?"<span class='reply-contents'>"+processMessageContents(value.contents)+"</span>":"";return"<span class='jump' data-jump='"+value.id+"'>Jump to reply</span><span class='user'>"+avatar+user+"</span>"+contents})}}}(),DOM=function(){var createElement=(ele,parent)=>{ele=document.createElement(ele);return parent.appendChild(ele),ele},entityMap={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"},entityRegex=/[&<>"']/g;return{id:(id,parent)=>(parent||document).getElementById(id),cls:(cls,parent)=>Array.prototype.slice.call((parent||document).getElementsByClassName(cls)),tag:(tag,parent)=>Array.prototype.slice.call((parent||document).getElementsByTagName(tag)),fcls:(cls,parent)=>(parent||document).getElementsByClassName(cls)[0],createElement:(tag,parent)=>createElement(tag,parent),removeElement:ele=>ele.parentNode.removeChild(ele),escapeHTML:html=>String(html).replace(entityRegex,s=>entityMap[s]),downloadTextFile:(fileName,url)=>{var ele=new Blob([url],{type:"octet/stream"});if("msSaveBlob"in window.navigator)return window.navigator.msSaveBlob(ele,fileName);url=window.URL.createObjectURL(ele),ele=createElement("a",document.body);ele.href=url,ele.download=fileName,ele.style.display="none",ele.click(),document.body.removeChild(ele),window.URL.revokeObjectURL(url)}}}(),EMBED=function(){var html,generated,enabled=!1;return{setup:function(){enabled=!0,html="<!DOCTYPE html>\n"+document.documentElement.outerHTML,DOM.id("btn-upload-file").insertAdjacentHTML("afterend",'<button id="btn-embed-file" disabled>Embed File</button>'),DOM.id("btn-embed-file").addEventListener("click",()=>function(fileName,url){var ele=new Blob([url],{type:"octet/stream"});if("msSaveBlob"in window.navigator)return window.navigator.msSaveBlob(ele,fileName);url=window.URL.createObjectURL(ele),ele=DOM.createElement("a",document.body);ele.href=url,ele.download=fileName,ele.style.display="none",ele.click(),document.body.removeChild(ele),window.URL.revokeObjectURL(url)}("embed.html",generated))},onFileRead:function(str){enabled&&(DOM.id("btn-embed-file").disabled=!1,generated=html.replace("</title>",`</title>\n<script type="text/javascript">window.DHT_EMBEDDED = "${str=str,window.btoa(unescape(encodeURIComponent(str)))}";<\/script>`).replace(`<${document.body.tagName.toLowerCase()}>`,'<body class="embedded">'))},getEmbeddedJSON:function(){var embed=window.DHT_EMBEDDED;return embed?decodeURIComponent(escape(window.atob(embed))):null}}}();document.addEventListener("DOMContentLoaded",()=>{var embedded=EMBED.getEmbeddedJSON();"?embed"!==location.search||embedded||EMBED.setup(),DISCORD.setup(),GUI.setup(),GUI.onOptionMessagesPerPageChanged(()=>{STATE.setMessagesPerPage(GUI.getOptionMessagesPerPage())}),STATE.setMessagesPerPage(GUI.getOptionMessagesPerPage()),GUI.onOptMessageFilterChanged(filter=>{STATE.setActiveFilter(filter)}),GUI.onNavigationButtonClicked(action=>{STATE.updateCurrentPage(action)}),STATE.onUsersRefreshed(users=>{GUI.updateUserList(users)}),STATE.onChannelsRefreshed((channels,selected)=>{GUI.updateChannelList(channels,selected,STATE.selectChannel)}),STATE.onMessagesRefreshed(messages=>{GUI.updateNavigation(STATE.getCurrentPage(),STATE.getPageCount()),GUI.updateMessageList(messages),GUI.scrollMessagesToTop()});function loadJSON(json,errParse,errInvalid){var obj;try{obj=JSON.parse(json),EMBED.onFileRead(json)}catch(e){return console.error(e),void alert(errParse)}SAVEFILE.isValid(obj)?STATE.uploadFile(new SAVEFILE(obj)):alert(errInvalid)}embedded?loadJSON(embedded,"Could not parse embedded file, see console for details.","Embedded file has an invalid format."):GUI.onFileUploaded(files=>{var file,reader;return 1===files.length?(file=files[0],reader=new FileReader,STATE.setUploadedFileName(file.name),reader.onload=()=>loadJSON(reader.result,"Could not parse '"+file.name+"', see console for details.","File '"+file.name+"' has an invalid format."),reader.readAsText(file,"UTF-8")):alert("Please, select only one file."),!0})});var GUI=function(){function getActiveFilter(){var active=DOM.fcls("active",DOM.id("opt-filter-list"));return active&&""!==active.value?{type:active.getAttribute("data-filter-type"),value:active.value}:null}function triggerFilterChanged(){var activeFilter=getActiveFilter();DOM.id("opt-save-filtered").classList.toggle("active",null!=activeFilter),eventOnOptMessageFilterChanged&&eventOnOptMessageFilterChanged(activeFilter)}function showModal(width,html){var dialog=DOM.id("dialog");return dialog.innerHTML=html,dialog.style.width=width+"px",dialog.style.marginLeft=-width/2+"px",DOM.id("modal").classList.add("visible"),dialog}function showSettingsModal(){function setupCheckBox(id,settingName){var ele=DOM.id(id);ele.checked=STATE.settings[settingName],ele.addEventListener("change",()=>STATE.settings[settingName]=ele.checked)}showModal(560,`
+<label><input id='dht-cfg-imgpreviews' type='checkbox'> Image Previews</label><br>
+<label><input id='dht-cfg-formatting' type='checkbox'> Message Formatting</label><br>
+<label><input id='dht-cfg-useravatars' type='checkbox'> User Avatars</label><br>
+<label><input id='dht-cfg-animemoji' type='checkbox'> Animated Emoji</label><br>`),setupCheckBox("dht-cfg-imgpreviews","enableImagePreviews"),setupCheckBox("dht-cfg-formatting","enableFormatting"),setupCheckBox("dht-cfg-useravatars","enableUserAvatars"),setupCheckBox("dht-cfg-animemoji","enableAnimatedEmoji")}var eventOnFileUploaded,eventOnOptMessagesPerPageChanged,eventOnOptMessageFilterChanged,eventOnNavButtonClicked;return{setup:function(){function resetActiveFilter(){inputMessageFilter.value="",inputMessageFilter.dispatchEvent(new Event("change")),DOM.id("opt-filter-contents").value="",DOM.id("opt-save-filtered").classList.remove("active")}var inputUploadedFile=DOM.id("uploaded-file"),inputMessageFilter=DOM.id("opt-messages-filter"),containerFilterList=DOM.id("opt-filter-list");DOM.id("btn-upload-file").addEventListener("click",()=>{inputUploadedFile.click()}),inputUploadedFile.addEventListener("change",()=>{eventOnFileUploaded&&eventOnFileUploaded(inputUploadedFile.files)&&(inputUploadedFile.value=null,resetActiveFilter())}),inputMessageFilter.value="",inputMessageFilter.addEventListener("change",()=>{DOM.cls("active",containerFilterList).forEach(ele=>ele.classList.remove("active")),inputMessageFilter.value&&containerFilterList.querySelector("[data-filter-type='"+inputMessageFilter.value+"']").classList.add("active"),triggerFilterChanged()}),Array.prototype.forEach.call(containerFilterList.children,ele=>{ele.addEventListener("SELECT"===ele.tagName?"change":"input",e=>triggerFilterChanged())}),DOM.id("opt-messages-per-page").addEventListener("change",()=>{eventOnOptMessagesPerPageChanged&&eventOnOptMessagesPerPageChanged()}),DOM.id("btn-save-filtered").addEventListener("click",()=>{confirm("Filtering only removes messages, all users and servers will remain in the new archive. Continue?")&&STATE.saveFilteredMessages()}),DOM.tag("button",DOM.fcls("nav")).forEach(button=>{button.disabled=!0,button.addEventListener("click",()=>{eventOnNavButtonClicked&&eventOnNavButtonClicked(button.getAttribute("data-nav"))})}),DOM.id("btn-settings").addEventListener("click",()=>{showSettingsModal()}),DOM.id("btn-about").addEventListener("click",()=>{var linkGH;showModal(560,`
+<p>Discord History Tracker is developed by <a href='https://chylex.com'>chylex</a> as an <a href='${linkGH="https://github.com/chylex/Discord-History-Tracker"}/blob/master/LICENSE.md'>open source</a> project.</p>
+<sub>v.31h, released 03 March 2024</sub>
+<p>Please, report any issues and suggestions to the <a href='${linkGH}/issues'>tracker</a>. If you want to support the development, please spread the word and consider <a href='https://www.patreon.com/chylex'>becoming a patron</a> or <a href='https://ko-fi.com/chylex'>buying me a coffee</a>. Any support is appreciated!</p>
+<p><a href='${linkGH}/issues'>Issue Tracker</a> &nbsp;&mdash;&nbsp; <a href='${linkGH}'>GitHub Repository</a> &nbsp;&mdash;&nbsp; <a href='https://twitter.com/chylexmc'>Developer's Twitter</a></p>`)}),DOM.id("messages").addEventListener("click",index=>{index=index.target.getAttribute("data-jump");index&&(resetActiveFilter(),index=STATE.navigateToMessage(index),DOM.id("messages").children[index].scrollIntoView())}),DOM.id("overlay").addEventListener("click",()=>{DOM.id("modal").classList.remove("visible"),DOM.id("dialog").innerHTML=""})},onFileUploaded:function(callback){eventOnFileUploaded=callback},onOptionMessagesPerPageChanged:function(callback){eventOnOptMessagesPerPageChanged=callback},onOptMessageFilterChanged:function(callback){eventOnOptMessageFilterChanged=callback},onNavigationButtonClicked:function(callback){eventOnNavButtonClicked=callback},getOptionMessagesPerPage:function(){return parseInt(DOM.id("opt-messages-per-page").value,10)},updateNavigation:function(currentPage,totalPages){DOM.id("nav-page-current").innerHTML=currentPage,DOM.id("nav-page-total").innerHTML=totalPages||"?",DOM.id("nav-first").disabled=1===currentPage,DOM.id("nav-prev").disabled=1===currentPage,DOM.id("nav-pick").disabled=(totalPages||0)<=1,DOM.id("nav-next").disabled=currentPage===(totalPages||1),DOM.id("nav-last").disabled=currentPage===(totalPages||1)},updateChannelList:function(channels,activeChannel,callback){var eleChannels=DOM.id("channels");channels?(null!=getActiveFilter()&&(channels=channels.filter(channel=>0<channel.msgcount)),eleChannels.innerHTML=channels.map(channel=>DISCORD.getChannelHTML(channel)).join(""),Array.prototype.forEach.call(eleChannels.children,ele=>{ele.addEventListener("click",e=>{var currentChannel=DOM.fcls("active",eleChannels);currentChannel&&currentChannel.classList.remove("active"),ele.classList.add("active"),callback(ele.getAttribute("data-channel"))})}),!activeChannel||(activeChannel=eleChannels.querySelector("[data-channel='"+activeChannel+"']"))&&activeChannel.classList.add("active")):eleChannels.innerHTML=""},updateMessageList:function(messages){DOM.id("messages").innerHTML=messages?messages.map(message=>DISCORD.getMessageHTML(message)).join(""):""},updateUserList:function(users){for(var eleSelect=DOM.id("opt-filter-user");1<eleSelect.length;)eleSelect.remove(1);var key,options=[];for(key of Object.keys(users)){var option=document.createElement("option");option.value=key,option.text=users[key].name,options.push(option)}options.sort((a,b)=>a.text.toLocaleLowerCase().localeCompare(b.text.toLocaleLowerCase())),options.forEach(option=>eleSelect.add(option))},scrollMessagesToTop:function(){DOM.id("messages").scrollTop=0}}}(),PROCESSOR={FILTER:{byUser:userindex=>message=>message.u===userindex,byTime:(timeStart,timeEnd)=>message=>message.t>=timeStart&&message.t<=timeEnd,byContents:substr=>message=>-1!==("m"in message?message.m:"").indexOf(substr),byRegex:regex=>message=>regex.test("m"in message?message.m:""),withImages:()=>message=>message.e&&message.e.some(embed=>"image"===embed.type)||message.a&&message.a.some(DISCORD.isImageAttachment),withDownloads:()=>message=>message.a&&message.a.some(attachment=>!DISCORD.isImageAttachment(attachment)),withEmbeds:()=>message=>message.e&&0<message.e.length,withAttachments:()=>message=>message.a&&0<message.a.length,isEdited:()=>message=>"te"in message?message.te:1==(1&message.f)},SORTER:{oldestToNewest:(key1,key2)=>key1.length===key2.length?key2<key1?1:key1<key2?-1:0:key1.length>key2.length?1:-1,newestToOldest:(key1,key2)=>key1.length===key2.length?key2<key1?-1:key1<key2?1:0:key1.length>key2.length?-1:1}};class SAVEFILE{constructor(parsedObj){var me=this;me.meta=parsedObj.meta,me.data=parsedObj.data,me.meta.users=me.meta.users||{},me.meta.userindex=me.meta.userindex||[],me.meta.servers=me.meta.servers||[],me.meta.channels=me.meta.channels||{}}static isValid(parsedObj){return parsedObj&&"object"==typeof parsedObj.meta&&"object"==typeof parsedObj.data}getServer(index){return this.meta.servers[index]||{name:"&lt;unknown&gt;",type:"ERROR"}}getChannels(){return this.meta.channels}getChannelById(channel){return this.meta.channels[channel]||{id:channel,name:channel}}getUsers(){return this.meta.users}getUser(index){return this.meta.users[this.meta.userindex[index]]||{name:"&lt;unknown&gt;"}}getUserId(index){return this.meta.userindex[index]}getUserById(user){return this.meta.users[user]||{name:user}}getUserIndex(user){return this.meta.userindex.indexOf(user)}getMessages(channel){return this.data[channel]||{}}filterToJson(filterFunction){var channel,newMeta=JSON.parse(JSON.stringify(this.meta)),newData={};for(channel of Object.keys(this.getChannels())){var key,messages=this.getMessages(channel),retained={};for(key of Object.keys(messages)){var message=messages[key];filterFunction(message)&&(retained[key]=message)}0<Object.keys(retained).length?newData[channel]=retained:delete newMeta.channels[channel]}return JSON.stringify({meta:newMeta,data:newData})}}var STATE=function(){function triggerChannelsRefreshed(selectedChannel){eventOnChannelsRefreshed&&eventOnChannelsRefreshed(ROOT.getChannelList(),selectedChannel)}function triggerMessagesRefreshed(){eventOnMessagesRefreshed&&eventOnMessagesRefreshed(ROOT.getMessageList())}var FILE,MSGS,uploadedFileName,filterFunction,selectedChannel,currentPage,messagesPerPage,eventOnChannelsRefreshed,eventOnMessagesRefreshed,eventOnUsersRefreshed,ROOT={};ROOT.onChannelsRefreshed=function(callback){eventOnChannelsRefreshed=callback},ROOT.onMessagesRefreshed=function(callback){eventOnMessagesRefreshed=callback},ROOT.onUsersRefreshed=function(callback){eventOnUsersRefreshed=callback},ROOT.uploadFile=function(file){FILE=file,selectedChannel=MSGS=null,currentPage=1,eventOnUsersRefreshed&&eventOnUsersRefreshed(ROOT.getUserList()),triggerChannelsRefreshed(),triggerMessagesRefreshed()},ROOT.setUploadedFileName=function(name){uploadedFileName=name},ROOT.getChannelName=function(channel){return FILE.getChannelById(channel).name},ROOT.getUserName=function(user){return FILE.getUserById(user).name},ROOT.getUserTag=function(user){return FILE.getUserById(user).tag};function getFilteredMessageKeys(keys){var messages=FILE.getMessages(keys),keys=Object.keys(messages);return keys=filterFunction?keys.filter(key=>filterFunction(messages[key])):keys}ROOT.getChannelList=function(){if(!FILE)return[];var channels=FILE.getChannels();return Object.keys(channels).map(key=>({id:key,name:channels[key].name,server:FILE.getServer(channels[key].server),msgcount:getFilteredMessageKeys(key).length,topic:channels[key].topic||"",nsfw:channels[key].nsfw||!1,position:channels[key].position||-1})).sort((ac,bc)=>{var as=ac.server,bs=bc.server;return as.type.localeCompare(bs.type,"en")||as.name.toLocaleLowerCase().localeCompare(bs.name.toLocaleLowerCase(),void 0,{numeric:!0})||ac.position-bc.position||ac.name.toLocaleLowerCase().localeCompare(bc.name.toLocaleLowerCase(),void 0,{numeric:!0})})},ROOT.selectChannel=function(channel){currentPage=1,MSGS=getFilteredMessageKeys(selectedChannel=channel).sort(PROCESSOR.SORTER.oldestToNewest),triggerMessagesRefreshed()},ROOT.getSelectedChannel=function(){return selectedChannel},ROOT.getMessageList=function(){if(!MSGS)return[];var messages=FILE.getMessages(selectedChannel),startIndex=messagesPerPage*(ROOT.getCurrentPage()-1);return MSGS.slice(startIndex,messagesPerPage?startIndex+messagesPerPage:void 0).map(key=>{var message=messages[key],user=FILE.getUser(message.u),avatar=user.avatar?{id:FILE.getUserId(message.u),path:user.avatar}:null,replyObj="r"in message&&message.r in messages?messages[message.r]:null,replyUser=replyObj?FILE.getUser(replyObj.u):null,replyAvatar=replyUser&&replyUser.avatar?{id:FILE.getUserId(replyObj.u),path:replyUser.avatar}:null,replyObj=replyObj?{id:message.r,user:replyUser,avatar:replyAvatar,contents:replyObj.m}:null;return{user:user,avatar:avatar,timestamp:message.t,contents:"m"in message?message.m:null,embeds:message.e,attachments:message.a,edit:"te"in message?message.te:1==(1&message.f),jump:key,reply:replyObj,reactions:"re"in message?message.re:null}})},ROOT.navigateToMessage=function(index){if(!MSGS)return 0;index=MSGS.indexOf(index);return-1==index?0:(currentPage=Math.max(1,Math.min(ROOT.getPageCount(),1+Math.floor(index/messagesPerPage))),triggerMessagesRefreshed(),index%messagesPerPage)},ROOT.hasActiveFilter=!1,ROOT.setActiveFilter=function(filter){switch(filter?filter.type:""){case"user":filterFunction=PROCESSOR.FILTER.byUser(FILE.getUserIndex(filter.value));break;case"contents":filterFunction=PROCESSOR.FILTER.byContents(filter.value);break;case"withimages":filterFunction=PROCESSOR.FILTER.withImages();break;case"withdownloads":filterFunction=PROCESSOR.FILTER.withDownloads();break;case"edited":filterFunction=PROCESSOR.FILTER.isEdited();break;default:filterFunction=null}ROOT.hasActiveFilter=null!=filterFunction,triggerChannelsRefreshed(selectedChannel),selectedChannel&&ROOT.selectChannel(selectedChannel)},ROOT.saveFilteredMessages=function(){var saveFileName="dht-filtered.txt";uploadedFileName&&(saveFileName=uploadedFileName.includes("filtered")?uploadedFileName:uploadedFileName.replace(".","-filtered.")),DOM.downloadTextFile(saveFileName,FILE.filterToJson(filterFunction))},ROOT.getUserList=function(){return FILE?FILE.getUsers():[]},ROOT.setMessagesPerPage=function(amount){messagesPerPage=amount,triggerMessagesRefreshed()},ROOT.updateCurrentPage=function(action){switch(action){case"first":currentPage=1;break;case"prev":currentPage=Math.max(1,currentPage-1);break;case"next":currentPage=Math.min(ROOT.getPageCount(),currentPage+1);break;case"last":currentPage=ROOT.getPageCount();break;case"pick":var page=parseInt(prompt("Select page:",currentPage),10);if(!page&&0!==page)return;currentPage=Math.max(1,Math.min(ROOT.getPageCount(),page))}triggerMessagesRefreshed()},ROOT.getCurrentPage=function(){var total=ROOT.getPageCount();return(currentPage=total<currentPage&&0<total?total:currentPage)||1},ROOT.getPageCount=function(){return MSGS?messagesPerPage?Math.ceil(MSGS.length/messagesPerPage):1:0},ROOT.settings={};var defineSettingProperty=(property,defaultValue,storageToValue)=>{var name="_"+property;Object.defineProperty(ROOT.settings,property,{get:()=>ROOT.settings[name],set:value=>{ROOT.settings[name]=value,triggerMessagesRefreshed(),((property,value)=>{try{localStorage.setItem(property,value)}catch(e){console.error(e)}})(property,value)}});var stored=(property=>{try{return localStorage.getItem(property)}catch(e){return console.error(e),null}})(property);null!==stored&&(stored=storageToValue(stored)),ROOT.settings[name]=null===stored?defaultValue:stored},fromBooleanString=value=>"true"===value||"false"!==value&&null;return defineSettingProperty("enableImagePreviews",!0,fromBooleanString),defineSettingProperty("enableFormatting",!0,fromBooleanString),defineSettingProperty("enableUserAvatars",!0,fromBooleanString),defineSettingProperty("enableAnimatedEmoji",!0,fromBooleanString),ROOT}(),TEMPLATE_REGEX=/{([^{}]+?)}/g;class TEMPLATE{constructor(contents){this.contents=contents}apply(obj,processor){return this.contents.replace(TEMPLATE_REGEX,(full,updated)=>{var value=updated.split(".").reduce((o,property)=>o[property],obj);if(processor){updated=processor(updated,value);return void 0===updated?DOM.escapeHTML(value):updated}return DOM.escapeHTML(value)})}}    </script>
+    <style type="text/css">
+#channels {width:15vw;min-width:215px;max-width:300px;overflow-y:auto;background-color:#1C1E22}
+#channels > div {cursor:pointer;padding:10px 12px;color:#eee;font-size:15px;border-bottom:1px solid #333333}
+#channels > div:hover, #channels > div.active {background-color:#282B30}
+#channels .info {display:flex;height:16px;margin-bottom:4px}
+#channels .name {flex-grow:1;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+#channels .tag {flex-shrink:1;background-color:rgba(255,255,255,0.08);border-radius:4px;margin-left:4px;margin-top:1px;padding:2px 5px;font-size:11px}
+body {font-family:Whitney, "Helvetica Neue", Helvetica, Verdana, "Lucida Grande", sans-serif;line-height:1;margin:0;padding:0;overflow:hidden}
+body.embedded .hide-embedded {display:none}
+#menu {width:100%;height:48px;display:flex;flex-direction:row}
+#app {height:calc(100vh - 48px);display:flex;flex-direction:row}
+#menu {background-color:#17181C;border-bottom:1px dotted #5D626B}
+#menu .splitter {width:1px;margin:9px 4px;background-color:#5D626B}
+#menu .separator {flex:1 1 0}
+#menu :disabled {background-color:#555;cursor:default}
+#menu button, #menu select, #menu input[type="text"] {margin:8px;background-color:#7289DA;color:#FFF;text-shadow:1px 1px 2px rgba(0,0,0,0.75)}
+#menu button {font-size:17px;padding:0 12px;border:0;cursor:pointer}
+#menu select {font-size:14px;padding:6px;border:0;cursor:pointer}
+#menu input[type="text"] {font-size:14px;padding:7px 12px;border:0}
+#menu .nav {display:flex;flex-direction:row;margin:0 8px}
+#menu .nav > button {font-size:14px}
+#menu .nav > button.icon {font-family:Lucida Console, monospace;font-size:17px;padding:0 8px}
+#menu .nav > button, #menu .nav > p {margin:8px 1px}
+#opt-filter-list > select, #opt-filter-list > input {display:none}
+#opt-filter-list > .active {display:block}
+#opt-save-filtered {display:flex}
+#opt-save-filtered:not(.active) {display:none}
+#messages {flex:1 1 0;overflow-y:auto;background-color:#36393E}
+#messages > div {margin:0 24px;padding:4px 0 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+#messages h2 {margin:0;padding:0;display:block}
+#messages .avatar-wrapper {display:flex;flex-direction:row;align-items:flex-start;align-content:flex-start}
+#messages .avatar-wrapper > div {flex:1 1 auto}
+#messages .avatar {flex:0 0 38px!important;margin:8px 14px 0 0}
+#messages .avatar img {width:38px;border-radius:50%}
+#messages .username {color:#FFF;font-size:15px;font-weight:600;margin-right:3px;letter-spacing:0}
+#messages .info {color:rgba(255,255,255,0.4);font-size:12px;font-weight:500;letter-spacing:0}
+#messages .info::before {content:"\2022";text-align:center;display:inline-block;width:14px}
+#messages .jump {cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.message {margin-top:6px;color:rgba(255,255,255,0.7);font-size:15px;line-height:1.1em;white-space:pre-wrap;word-wrap:break-word}
+.message .link, .reply-message .link {color:#7289DA;background-color:rgba(115,139,215,0.1)}
+.message a, .reply-message a {color:#0096CF;text-decoration:none}
+.message a:hover {text-decoration:underline}
+.message p {margin:0}
+.message .embed {display:inline-block;margin-top:8px}
+.message .embed .title {font-weight:bold;display:inline-block}
+.message .embed .desc {margin-top:4px}
+.message .thumbnail {max-width:calc(100% - 20px);max-height:320px}
+.message .thumbnail img {max-width:100%;max-height:320px;border-radius:3px}
+.message .download {margin-right:8px;padding:8px 9px;border:1px solid rgba(255,255,255,0.5);border-radius:3px}
+.message .embed:first-child, .message .download + .download {margin-top:0}
+.message code {background-color:#2E3136;border-radius:5px;font-family:Menlo, Consolas, Monaco, monospace;font-size:14px}
+.message code.inline {display:inline;padding:2px}
+.message code.block {display:block;border:2px solid #282B30;margin-top:6px;padding:7px}
+.message .emoji {width:22px;height:22px;margin:0 1px;vertical-align:-30%;object-fit:contain}
+.reply-message {display:flex;align-items:baseline;flex-wrap:wrap;line-height:120%;white-space:nowrap}
+.reply-message-with-avatar {margin:0 0 -2px 52px}
+.reply-message .jump {color:rgba(255,255,255,0.4);font-size:12px;text-underline-offset:1px;margin-right:7px}
+.reply-message .emoji {width:16px;height:16px;vertical-align:-20%;object-fit:contain}
+.reply-message .user {margin-right:5px}
+.reply-avatar {margin-right:4px}
+.reply-avatar img {width:16px;border-radius:50%;vertical-align:middle}
+.reply-username {color:#FFF;font-size:12px;font-weight:600;letter-spacing:0}
+.reply-contents {display:inline-block;color:rgba(255,255,255,0.7);font-size:12px;max-width:calc(80%)}
+.reply-contents p {margin:0;overflow:hidden;text-overflow:ellipsis}
+.reply-contents code {background-color:#2E3136;font-family:Menlo, Consolas, Monaco, monospace;padding:1px 2px}
+.reactions {margin-top:4px}
+.reactions .reaction-wrapper {display:inline-block;border-radius:4px;margin:3px 2px 0 0;padding:3px 6px;background:#42454a;cursor:default}
+.reactions .reaction-emoji {margin-right:5px;font-size:16px;display:inline-block;text-align:center;vertical-align:-5%}
+.reactions .reaction-emoji-custom {height:15px;margin-right:5px;vertical-align:-10%}
+.reactions .count {color:rgba(255,255,255,0.45);font-size:14px}
+#modal div {position:absolute;display:none}
+#modal.visible div {display:block}
+#modal #overlay {left:0;top:0;width:100%;height:100%;background-color:#000}
+#modal.visible #overlay {opacity:0.5}
+#dialog {left:50%;top:50%;padding:16px;background-color:#fff;transform:translateY(-50%)}
+#dialog p {line-height:1.2}
+#dialog p:first-child, #dialog p:last-child {margin-top:1px;margin-bottom:1px}
+#dialog sub {color:#999;font-size:12px}
+#dialog a {color:#0096CF;text-decoration:none}
+#dialog a:hover {text-decoration:underline}
+    </style>
+  <script src="chrome-extension://nngceckbapebfimnlniiiahkandclblb/content/fido2/page-script.js" id="bw-fido2-page-script"></script></head>
+  <body>
+    <div id="menu">
+      <input id="uploaded-file" type="file" style="display:none">
+      <button id="btn-upload-file" class="hide-embedded">Load File</button>
+      
+      <div class="splitter hide-embedded"></div>
+      
+      <button id="btn-settings">Settings</button>
+      
+      <div> <!-- needed to stop the select from messing up -->
+        <select id="opt-messages-per-page">
+          <option value="50">50 messages per page&nbsp;</option>
+          <option value="100">100 messages per page&nbsp;</option>
+          <option value="250">250 messages per page&nbsp;</option>
+          <option value="500">500 messages per page&nbsp;</option>
+          <option value="1000">1000 messages per page&nbsp;</option>
+          <option value="0">All messages&nbsp;</option>
+        </select>
+      </div>
+
+      <div class="nav">
+        <button id="nav-first" data-nav="first" class="icon" disabled="">«</button>
+        <button id="nav-prev" data-nav="prev" class="icon" disabled="">‹</button>
+        <button id="nav-pick" data-nav="pick" disabled="">Page <span id="nav-page-current">1</span>/<span id="nav-page-total">1</span></button>
+        <button id="nav-next" data-nav="next" class="icon" disabled="">›</button>
+        <button id="nav-last" data-nav="last" class="icon" disabled="">»</button>
+      </div>
+      
+      <div class="splitter"></div>
+      
+      <div> <!-- needed to stop the select from messing up -->
+        <select id="opt-messages-filter">
+          <option value="">No filter&nbsp;</option>
+          <option value="user">Filter messages by user&nbsp;</option>
+          <option value="contents">Filter messages by contents&nbsp;</option>
+          <option value="withimages">Only messages with images&nbsp;</option>
+          <option value="withdownloads">Only messages with downloads&nbsp;</option>
+          <option value="edited">Only edited messages&nbsp;</option>
+        </select>
+      </div>
+      
+      <div id="opt-filter-list">
+        <select id="opt-filter-user" data-filter-type="user" class="">
+          <option value="">Select user...</option>
+        <option value="965681413229797386">__chimichanga__</option><option value="1071099171156791306">_._kairos_._</option><option value="1081322791808274432">_._normik_._</option><option value="980391530604937226">_._unnamed_._</option><option value="323126540567052308">_kraund</option><option value="895782890837770250">_stomatolog_</option><option value="1103270843754225736">_verblud_</option><option value="763095667672481802">.cosmosun</option><option value="573964442325483561">.frdm</option><option value="849907374067679272">.greutbegnenxer</option><option value="249863795504054272">.kappatych</option><option value="887412309583093770">.mr.fun</option><option value="825798445205159977">.pahomchik</option><option value="406734376458518528">.quantiik</option><option value="537029161349283870">.racken</option><option value="1119579567221383289">.rpsl</option><option value="664480707619323944">.safip</option><option value="892703438931111956">0leksii</option><option value="915618021186342933">0x15p</option><option value="852083769228787753">0xmike7</option><option value="732638724160225493">0xryder</option><option value="1038782355755773972">4collec_tor2</option><option value="846843180414271539">a.mashura</option><option value="1209937372943482921">adi_dasslerrr</option><option value="371645690775994368">aerwils</option><option value="420608724147634177">albadriatica</option><option value="847239578309230682">albiwara</option><option value="936287071432245358">aleks_ukrop</option><option value="834060459048960071">aleksrich</option><option value="874722461562859651">alex.ribacov</option><option value="1069309710433525810">alexgreen86</option><option value="887978751047106570">alexkart1520</option><option value="256520732807397376">alexmed5188</option><option value="1210885997022412810">alexx1one</option><option value="714796026887929916">alfa123</option><option value="1214996107004739644">alle1010</option><option value="1038912117778170016">alyt10x</option><option value="706830458779992136">amiran485</option><option value="998336670271291403">anastasiia19</option><option value="802418302638751775">anderbay.</option><option value="655839292257599518">andreus77</option><option value="1075777440837808158">andrew_g2d</option><option value="952199069130952744">andrew_voichenko</option><option value="1102925323869376602">andrey_al</option><option value="887299775794393088">andrey_lapin</option><option value="828967178287972392">andrii8414</option><option value="1034544391915851907">andriy_m</option><option value="1111217109528215582">andriy5555</option><option value="915364417628143656">andrybarb2804</option><option value="499693030446465050">angrymoron</option><option value="408628363608195072">anton534</option><option value="624192030381178880">antonperl</option><option value="978005821021622283">apoddubny</option><option value="338714499169386498">aprokhorenko</option><option value="374984723048431616">arhitektorua</option><option value="797250141920821289">armanyprofessor</option><option value="936187752502939659">arrtem8811</option><option value="395867165401808897">artem0122</option><option value="882566993499258880">artemnahornyi</option><option value="1213967993768386593">asd.inc</option><option value="428957456585195530">astros37</option><option value="270194545067687936">atan_</option><option value="412614461027909644">avykay</option><option value="1004377511989346405">ba7kervil</option><option value="943729709215281222">babyz2060</option><option value="672112871722844200">balu2727</option><option value="1160969958512140419">bananaice13</option><option value="719237285781962792">banquierr</option><option value="789673228204376094">barin_od_ua</option><option value="901438474874388490">barsykov</option><option value="803032758489710613">bartekm96</option><option value="1090352225320189982">bblup</option><option value="351028905785950212">beetlz</option><option value="738384025378619484">ber_d</option><option value="601114114047082532">besdarkdanya</option><option value="842373104429039647">billy0002734</option><option value="691726961696964668">blendjoi</option><option value="760220372074496051">bohdant</option><option value="823582796102238260">bojo8848</option><option value="1080120840705818684">bonanza36</option><option value="1212797370496979078">borovic_</option><option value="993648732769882213">boynicesz</option><option value="1195843492866441330">bunnycryp</option><option value="835133215999393802">captaink3420</option><option value="642989201142579200">carlot_0806</option><option value="746321046206152775">cepdy4ek</option><option value="746696292603789416">cerito43</option><option value="1079358286400344207">cherniyirtish</option><option value="934033898285985822">chiga_biga</option><option value="636665087977062408">chillyourmind</option><option value="486615408346923030">chthulhu23</option><option value="518105903774564353">citizienb</option><option value="933447043811262555">code_owner</option><option value="677900756745191434">cornishonua</option><option value="949696230508884028">cosmonew</option><option value="886455222354980944">cryptoabudence</option><option value="887608542721351680">cryptobaza</option><option value="893542000505290782">cryptohighheels</option><option value="1075890289534832731">cryptohouse3571</option><option value="1046034406546096148">cryptopan</option><option value="1041201062369034280">cryptoscrooge01</option><option value="1194974615592767548">cyberhuntter</option><option value="731152133101191168">cypher_avk</option><option value="837243090057822208">d.nazarenko1111</option><option value="970938497655525406">dabvoz</option><option value="600061740230770704">dankaan</option><option value="639533861373739009">dannying</option><option value="936170632478068768">daotao</option><option value="407940015566618624">darthtyranusalex</option><option value="876222604552306698">davidd2543</option><option value="453491616271826944">degenic</option><option value="926133942191542292">denbondcargo</option><option value="1200940526300569632">denverreth</option><option value="621656455715618816">denyaafonya.eth</option><option value="1209992140936056903">denys849</option><option value="897049268513288253">dev_web3</option><option value="989485216122941510">dididi3273</option><option value="928318085335752724">diferstd</option><option value="1035559044519309404">dima19871987</option><option value="615512164085792778">dimaallsan</option><option value="793954718321082418">dimastarantas</option><option value="789920565593899028">dimaudacha</option><option value="966981356343140403">dimazh</option><option value="1208132687072722966">dinkodonko</option><option value="691979932271771690">dmitry.0x</option><option value="764484905509453835">dmytro_from_ua</option><option value="900829340823064656">dmytro8261</option><option value="871098584479727697">dolfin3906</option><option value="954049155947450368">dope_vc</option><option value="616325314758574100">doubl_ex</option><option value="820969352479899648">dzeki07</option><option value="640118187383324674">egm1337</option><option value="958492633448214598">emmzypro.</option><option value="542025742628683807">ender_qq</option><option value="386158235918532618">ericcartman777</option><option value="829961903136702516">f1ntech</option><option value="1196217322302603327">f2pasha_18328</option><option value="348492071587545089">f4t.tony</option><option value="1142382811861504113">fabyboy</option><option value="389789892978278400">fartbreath</option><option value="887322811906027590">feeeniqs</option><option value="443746392112889867">fexsgolar</option><option value="686569404011773964">fireridlle</option><option value="899329436376260668">forekt</option><option value="538422084234248212">fotex</option><option value="414349926441680907">g0od_mo0d</option><option value="932276136627544115">gaaad1</option><option value="1194671026664132694">gamer.ignat</option><option value="964840372972961832">gekissss</option><option value="1200568434426126336">ggwp_easyy</option><option value="401234468725325825">giribit</option><option value="1134400763670560818">global228.</option><option value="885784478587449375">gosha9977</option><option value="1199057319871402004">gositr</option><option value="669518493775036438">gregor_fnm</option><option value="967782648959344712">gregor.me</option><option value="352201196724944898">gregt9817</option><option value="483192383807160320">grekul.</option><option value="1035104668642201610">grime5772</option><option value="495828094230200340">guessas</option><option value="768204729301073963">guid_eth</option><option value="723237403061649439">h1ghr0ller_0_0</option><option value="1017660166226845706">hashuk</option><option value="1034074099808485498">hero0f_heaven</option><option value="490501944637390879">hessinger</option><option value="284777814446571521">hexdrunker</option><option value="772137014988374036">hipp0p0p0</option><option value="383912047672557570">horr0r_</option><option value="935916566472691832">hrost.</option><option value="1059512170737586356">hyper7227</option><option value="159028990466588672">i.will.be.hokage</option><option value="239303337080520705">ibaldr</option><option value="827213180694298634">iboyhasnoname</option><option value="275103294651760640">ig_4m</option><option value="692471318636920834">igor_171</option><option value="705823459305062471">igor.kostetskyi</option><option value="969569385452810252">illiad9520</option><option value="1204460189491789890">infer_crypto</option><option value="1191739785895743538">innovatorpy_49896</option><option value="1024598733184307232">jacobimpossible</option><option value="843223847963590717">jcomper</option><option value="800522525133635584">john_jung.</option><option value="1210269091814842442">john_wide</option><option value="997772143226015764">kabo9999</option><option value="1171170225417363486">kaimalon</option><option value="398510632988835840">kam_m</option><option value="1031799859973464114">kasiba.</option><option value="541296641110441984">kava17</option><option value="1194615613939777576">kerya_benss</option><option value="425968595755859968">kexdon84</option><option value="890284689473011794">khaitovroman</option><option value="1106483139066470481">kingsman8719</option><option value="1074044394770014298">kirilllema</option><option value="212645135387852801">kisokome</option><option value="941771954896117790">kitkit121</option><option value="1181577661718470698">kkhudyk_57716</option><option value="925285057374076968">klimmo</option><option value="550617356326404111">kofeinstyle</option><option value="1167030074386694264">kohajr</option><option value="710578435294101674">komers_01</option><option value="388069487540305921">konstantin9277</option><option value="943269798148726884">korono55</option><option value="1022247385495253012">kostiagts1</option><option value="1021761912972791888">kras1kua</option><option value="1194982838144086057">kriptomax_11357</option><option value="965945896766423040">kucher1st</option><option value="1112669300411617301">kuzz007</option><option value="871479422379782184">kvqd777</option><option value="299878984261304320">kxinon</option><option value="1174746733536882688">l_e_a_m</option><option value="1082752773843587216">lafax1</option><option value="987148133995786280">lamer.0</option><option value="693409373254582333">larpseidon</option><option value="887373423435710494">lawyer4352</option><option value="1083514498079531200">lebwa16</option><option value="449574485025226772">leonholds</option><option value="1004031150991355984">lexq1</option><option value="1210586377478078464">lionarch_57548</option><option value="790585594626703380">liveevilll</option><option value="1091843751321796778">luckycrypto99</option><option value="895370319429271572">madman7388</option><option value="1203720975372259409">makhotass</option><option value="1195395338408825054">maks_0777</option><option value="1035434899202650153">maksym.defi</option><option value="802579569671405619">maliuk_</option><option value="435379664190570497">maluksawa</option><option value="841621874676203520">markcrkt</option><option value="835872420526161951">marketkilla</option><option value="706619273971499068">max.13.</option><option value="368680256204439552">maxmadison</option><option value="1022572849862557717">maybe_profit</option><option value="1188165567652311060">mbworking</option><option value="1120780339250483242">mental_abuse</option><option value="905026606261755944">metadato</option><option value="702180391414399086">mglevche</option><option value="891720237869850654">michael09.</option><option value="1073335321644769435">mikhail_pochekai</option><option value="1115663519921217637">mikhail123sh</option><option value="1194719641243746314">millionixov_46497</option><option value="581146368010092569">miner9</option><option value="443371605989523456">mirik93</option><option value="1194961970080788560">miwa_17221</option><option value="860274260630831124">moonarack</option><option value="396043657691791361">mplife</option><option value="601758050050637846">mr_bodcher</option><option value="985288933296455712">mr_pepsss</option><option value="1194320531508433050">mr._.bronson</option><option value="828664816507158600">mrchsko</option><option value="163709514422419458">mrflir</option><option value="705814072708431872">mrpro100</option><option value="417689229397852160">mrstillalive</option><option value="456837268435501077">muv_ik</option><option value="1171219234618085418">mykyta7777</option><option value="818158608117792789">n1_ha0</option><option value="968224538808709163">nazar.d</option><option value="675423480283660300">nazar9230</option><option value="1210475744455557131">nazferb_92468</option><option value="619619888792731688">ne_ilya.</option><option value="1183859564400103485">nikita_54405</option><option value="1192377484331716658">nikolay0426</option><option value="752093176566775858">nikosv666</option><option value="1139152323155869727">nodraner777</option><option value="1194394765379260457">nogatty</option><option value="882558874299809792">nook.i</option><option value="804157060613800007">notdevepe</option><option value="915515447632363570">ns5161</option><option value="909192413296336917">odysseus777</option><option value="819284703487459338">oig_res</option><option value="888413721351819294">okalajda</option><option value="1092498510240305303">ol_lord</option><option value="913442558795984948">oleh_tantsiura</option><option value="815944188767240202">oleh1946</option><option value="679593594071285780">oleksiidurniev</option><option value="781946560183140362">oli1731</option><option value="1194660528073756735">onemillion976</option><option value="521040601660129280">panadol_ua</option><option value="1190037530142314507">papet_74943</option><option value="605487982228799509">paradox0440</option><option value="990568776170889226">pashkevich_17</option><option value="891650361469833236">pashkevich_7</option><option value="404660580226695169">pashteasy</option><option value="260832042818732033">pashukanis</option><option value="898927176114659429">penguin8.sol</option><option value="743900493637484671">phongbui86</option><option value="947453414399438901">pinguin_ok</option><option value="870525062736932875">pk11111987</option><option value="962479948017303603">plaginbaby</option><option value="518470966326722567">plixcid</option><option value="969531338577309756">pluxurynmd.</option><option value="1067826878859198614">polchyn</option><option value="825802057814507520">poolcleaner</option><option value="412284169880862725">popy789</option><option value="881181928647180310">povar2407</option><option value="1187087305077424242">proctor0848</option><option value="838036954448396349">profiinvestor</option><option value="826175225934119013">ququwka1231</option><option value="550197825057718303">r.shrnv</option><option value="792139860583514142">r00tlnx</option><option value="816041955984932875">ra_99999</option><option value="920401258320388126">rantanov</option><option value="840186888538292254">rapiks</option><option value="778736573351985173">renegade06</option><option value="969894294003523594">reserv1</option><option value="863061471608832030">rgbelic</option><option value="1081815963990761542">Rick</option><option value="901754832719855677">romstr</option><option value="452646635512528896">runner109</option><option value="842113788533932032">sacchar</option><option value="911750315882201109">samoajoe.</option><option value="530040902119456778">sanek1374</option><option value="940883989172998177">sanyk19</option><option value="1004376999969693748">sayman777</option><option value="342747760400924673">schmoe.eth</option><option value="599298983373832192">scott0267</option><option value="878661546564255774">semen_l</option><option value="1065582110758420570">senjaparadesa</option><option value="689049765828231208">sergeisergei_</option><option value="793146006187016252">serhiiromanenko</option><option value="965623043852492850">serhio_serhio_</option><option value="883656891413184532">serpalych</option><option value="790620574736187393">seruy29</option><option value="657183636801716226">sevenpaca</option><option value="1072595155019911288">shatter_420</option><option value="830204057150160896">shaza2403</option><option value="1196154942931611807">sikachcrypto</option><option value="814471866139279420">silver_onat</option><option value="1090663861935411220">sima10</option><option value="1194704877356589210">siriuz_ua</option><option value="287991238572113920">skazo4nik777</option><option value="1039990871707373718">skb777</option><option value="297412654568570881">skuper</option><option value="1050757547046477904">slava321</option><option value="832234145227997216">slava6508</option><option value="548904926135189506">smeeerf</option><option value="827973638862405703">smerch6297</option><option value="782208407708762112">smotis</option><option value="756699727428583445">sniper8928</option><option value="1176846441294090314">sojen99_98809</option><option value="1213906352863322164">solomon995</option><option value="900113233623527446">sp0ter</option><option value="790011309151354891">speachlesss</option><option value="362237385402220544">stannlygo</option><option value="1037090564660789349">stark555</option><option value="722742196159119410">stas9340</option><option value="964107791503609878">stem6442</option><option value="1195779727110197348">step_ms1</option><option value="1094976253741781064">supportsavant</option><option value="801010359515349022">swargo</option><option value="1225406789831364628">t_a_n_o_s.</option><option value="824989771196530708">taras0734</option><option value="1073558689757265951">teoshich</option><option value="670718209535770624">teslohrad</option><option value="1195661572501151775">tetris_23779</option><option value="402084743140737025">thickpipe</option><option value="887311203804782603">toha_crypto</option><option value="897195361821671464">trader_01</option><option value="895554443960020992">trafic7771</option><option value="321379505052712971">trapted1</option><option value="1023938873597902942">trokhim</option><option value="1195759920050618490">truebill.</option><option value="509354222723006486">tuanchik</option><option value="1195300377478832149">tushonka_228</option><option value="829742081240727563">ufo_qq</option><option value="706539232369311846">ujean7k</option><option value="1082305162728706088">unicorngroup11</option><option value="946823157019476009">unknowncraftman</option><option value="812750488176296046">untitled7717</option><option value="1088531686351962123">urxiysinqanf</option><option value="1195086370390159400">v.s0631</option><option value="1145816624499269722">v1ktorov1ch</option><option value="972231736878575667">vadimprodan</option><option value="763341336140185600">valeryevna</option><option value="1123278019767844884">van777gogh</option><option value="1220457900116279383">vasyl.kyslyi</option><option value="1035518756430032936">vdegest</option><option value="703188127178817576">veloqx</option><option value="883726847844683817">viachbor</option><option value="909875038017167371">viacheslav9899</option><option value="876465006240215090">viktor_1995</option><option value="1187412291759644727">vinfats237.</option><option value="1195888220525838336">violi0n</option><option value="836682605130547261">vitaliyustyanych</option><option value="1194590395208827032">vn.mm.squad</option><option value="620011948330975232">volodymyromelianiuk</option><option value="870213242939670539">vs_crypto</option><option value="525708436642594827">vtymane</option><option value="417992426180050945">vzhurko</option><option value="1168668142365577317">vzhyv</option><option value="413089232660332545">wildinflower</option><option value="475469889188921346">wladdoss</option><option value="805861237510373379">x10pro</option><option value="665242960358539325">xmassanta</option><option value="580884283535654914">xmax10</option><option value="1046556984138276925">xvaluey</option><option value="1195649083491229701">ya_kiv</option><option value="804626830240907264">yak0stak</option><option value="1018268568086913196">yappooot</option><option value="1052506851301924864">yarikus1991</option><option value="541687141562974209">yaroslav3065</option><option value="507299670935207946">yellow_di</option><option value="1091329053430128720">yelyaka</option><option value="274332092576432131">youngeagle</option><option value="879469529825169418">yu3ik</option><option value="934761703781064704">yura_4551</option><option value="484098125317931019">yuriygudimov</option><option value="1052868377384845312">zav0d4an1n</option><option value="851037503564546058">zavodila_1</option><option value="1059902761103274075">zeiryu_</option><option value="839959933264592918">zhurekk</option><option value="880702542651228161">zpoken</option><option value="1213918558455730196">zzzyablik</option></select>
+        <input id="opt-filter-contents" type="text" data-filter-type="contents" placeholder="Messages containing...">
+        <input type="hidden" data-filter-type="withimages" value="1">
+        <input type="hidden" data-filter-type="withdownloads" value="1">
+        <input type="hidden" data-filter-type="edited" value="1">
+      </div>
+      
+      <div id="opt-save-filtered">
+        <div class="splitter"></div>
+        <button id="btn-save-filtered">Save Filtered Messages</button>
+      </div>
+      
+      <div class="separator"></div>
+      
+      <button id="btn-about">About</button>
+    </div>
+    
+    <div id="app">
+      <div id="channels"><div data-channel="1206641144402935879"><div class="info" title=""><strong class="name">#EigenLayer | Зелёная миля</strong><span class="tag">4490</span></div><span class="server">DOUBLETOP SQUAD (server)</span></div><div data-channel="1219198504430211122" class="active"><div class="info" title=""><strong class="name">#🥞eth-staking</strong><span class="tag">20</span></div><span class="server">DOUBLETOP SQUAD (server)</span></div><div data-channel="1026094620427427913" class=""><div class="info" title=""><strong class="name">#💬│general</strong><span class="tag">401</span></div><span class="server">Smilee (server)</span></div></div>
+      <div id="messages"><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></div><div><h2><strong class="username" title="#0">g0od_mo0d</strong><span class="info time">19/03/2024, 11:19:14</span><span class="info edited">Edited 19/03/2024, 11:43:35</span></h2><div class="message"><p><b>Куда сейчас застекать ETH?</b>
+
+Опишу вам свою стратегию.
+
+Во первых я прощаюсь с eETH на какое-то время. Не думаю, что они раздадут дроп во втором сезоне более дорогой, чем предстоящие дропы от своих конкурентов.
+
+У нас остаются Kelp, Renzo, Puffer, Swell.
+Пойдем методом исключения.
+- Kelp не анонсировали бекеров. Нет какой-то киллер фичи.
+- Puffer все еще не запилили нативный стекинг. А это значит, если мы положим туда ETH, то не будем получать EL поинты. Хоть и по остальным пунктам мне проект нравится: Антислэшинг и Бинанс в инвесторах, но EL поинты важны.
+- Swell не плох. Пилят свою сеть, средние фонды.
+- Renzo сделали упор на мультичейновость. В бекерах Бинанс.
+
+<b>Учитывая аргументы выше, я распределил протоколы LRT следующим образом:</b>
+- 70% в Renzo
+- 15% в Puffer (лежит со времен открытых пулов в EL. Поэтому у меня поинты идут)
+- 15% в Swell
+В будущем я переложу почти весь Renzo в Puffer. Т.к. Renzo нафармлю достаточно.
+
+<b>Как распределить LRT токены между различными протоколами:</b>
+- Весь Puffer идет в Zircuit
+- Весь Swell идет в Karak
+- Renzo (100%) распределяется между
+-30% в YT ezETH (Zircuit) Eth
+-30% в Zircuit напрямую
+-20% в BlackWing
+-20% в Mode
+
+<i>_Если у вас мало ETH:_</i>
+Я бы положил все в YT ezETH (Zircuit) Eth
+
+По этому распределению можно понимать мои приоритеты и распределить свой портфель любого размера самостоятельно.
+
+Больше информации:
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt;  
+<a href="https://www.notion.so/2top/ETH-YIELD-8248d56b06d24c54b5e971faf046a229?pvs=4" target="_blank" rel="noreferrer">https://www.notion.so/2top/ETH-YIELD-8248d56b06d24c54b5e971faf046a229?pvs=4</a>
+&lt;@&amp;881829120173035551&gt; 
+<a href="https://www.notion.so/2top/ETH-YIELD-705557079ce3419cba51be7ec319e037?pvs=4" target="_blank" rel="noreferrer">https://www.notion.so/2top/ETH-YIELD-705557079ce3419cba51be7ec319e037?pvs=4</a></p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">127</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">44</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">14</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🫡</span><span class="count">4</span></span><span class="reaction-wrapper"><img src="./Discord Offline History_files/1008389720763551815.gif" alt=":11:" title=":11:" class="reaction-emoji-custom"><span class="count">9</span></span><span class="reaction-wrapper"><img src="./Discord Offline History_files/1008389719228416010.gif" alt=":10:" title=":10:" class="reaction-emoji-custom"><span class="count">3</span></span><span class="reaction-wrapper"><span class="reaction-emoji">💎</span><span class="count">0</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></div><div><h2><strong class="username" title="#0">g0od_mo0d</strong><span class="info time">21/03/2024, 05:18:33</span><span class="info edited">Edited 21/03/2024, 11:11:45</span></h2><div class="message"><p><b>YT ezETH</b>
+
+Сделал таблицу с расчетом выгодности различных пулов YT ezETH.
+
+Вы должны понимать, что в этих расчетах минимум фактов и максимум фантазии. Так что относитесь скептически. 
+Но соотношение цифр должно приблизительно соответствовать.
+
+Почему цифры такие? - Я художник.
+Но вы можете подставить свои.
+[Ссылка на таблицу](<a href="https://docs.google.com/spreadsheets/d/1t1HtBJQ4YxbpcsfVPgm3bXX1Fxum53fyfpgbI8ku6iM/edit?usp=sharing" target="_blank" rel="noreferrer">https://docs.google.com/spreadsheets/d/1t1HtBJQ4YxbpcsfVPgm3bXX1Fxum53fyfpgbI8ku6iM/edit?usp=sharing</a>)
+
+Быстренько пройдусь по каждому из них:
+
+<b>- 25 Apr 2024 Eth</b>
+Самые короткие. Полностью обесценятся через 35 дней.
+Но за это время вы заработаете ~$13K от двух дропов. Вычитайте отсюда утерянный ETH.
+
+<b>- 27 Jun 2024 Arb</b>
+Длинные. Тут вы скорей всего не потеряете все, как в первом случае. И по примеру EETH сможете забрать 70-50% от вложений.
+Заработок, за 98 дней может составить 9170$
+
+<b>- 27 Jun 2024 Zircuit</b>
+Если в первых двух мультипликатор 2х давался на поинты Renzo, то тут он дается на Zircuit.
+И к сожалению я не могу посчитать стоимость дропа даже приблизительно.
+Пишите свои варианты в чате.
+Но я уверен, что выйти с оценкой меньше, чем Renzo, Zircuit не сможет. Главный вопрос - на сколько ваши поинты размоются рефоводами.
+Сделаю допущение, что по итогу этот YT окажется по прибыльности примерно, как второй.
+Но у этого есть преимущество. Т.к. тут заложено сразу 3 дропа, он может почти не обесценится при выходе любого из них и вы сможете выйти около нуля.
+Скорей всего дроп от Renzo выйдет раньше, чем дроп от Zircuit. Поэтому фармить именно Zircuit с х2 и в долгую, может быть более выгодно.
+
+<b>Вывод:</b>
+Я разделил выделенное на YT на 2 части.
+40% я сожгу в "25 Apr 2024 Eth"
+60% я положил и постараюсь спасти в "27 Jun 2024 Zircuit"
+
+<i>_Что надо знать:_</i>
+- Сейчас пик хайпа YT. Если покупаете сейчас, то покупаете на хаях.
+- Выгодно ли ждать, зависит от того, когда упадет цена. Для покупки коротких ждать точно не выгодно, т.к. они будут обесцениваться каждый день.
+Если нацелены на длинные, то можете подождать. Они могут подешеветь, а могут и нет.
+- Если вы все еще не умеете пользоваться Pendle и не знаете, что такое YT, вот видео:
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt;
+<a href="https://www.notion.so/2top/Pendle-9ee04d59717b46e0b14c6006bc0a5019?pvs=4" target="_blank" rel="noreferrer">https://www.notion.so/2top/Pendle-9ee04d59717b46e0b14c6006bc0a5019?pvs=4</a>
+ &lt;@&amp;881829120173035551&gt;
+<a href="https://www.notion.so/2top/Pendle-a7c06b4318fd430dba9a69a2b8eb45fc?pvs=4" target="_blank" rel="noreferrer">https://www.notion.so/2top/Pendle-a7c06b4318fd430dba9a69a2b8eb45fc?pvs=4</a></p><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1220209913461211207/image.png?ex=66209109&amp;is=660e1c09&amp;hm=03073573f7f37c88063c046d91cae4af9380d57bc51cf863b48b3f151d232579&amp;" class="embed download">Download image.png?ex=66209109&amp;is=660e1c09&amp;hm=03073573f7f37c88063c046d91cae4af9380d57bc51cf863b48b3f151d232579&amp;</a></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">76</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">12</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">12</span></span><span class="reaction-wrapper"><span class="reaction-emoji">❤️‍🔥</span><span class="count">7</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">21/03/2024, 17:06:43</span></h2><div class="message"><p><b>Второй сезон от Ether.fi: StakeRank</b>
+
+Выкатили более четкие критерии для стейкеров:
+- StakeRank это система, состоящая из 10 уровней.
+- Она основана на том, как долго вы стейкаете.
+- Каждый “StakeRank” уровень дает множитель, увеличивающий поинты за каждый ЕТН.
+- После каждой 1 недели стейкинга eETH разблокируеся следующий уровень StakeRank.
+- Клейм уровня стоит 5 ETHFI (~20$ на текущий момент)
+- Все, кто заклеймили ETHFI после первого сезона, начнут со второго уровня.
+- Если вы холдите нфт, то можете увеличить уровень, в зависимости от тира нфт: брозна - 1, серебро - 2, золото 3, платина - 4.
+- И конечно лидерборд.
+
+В общем, выглядит не плохо, но и не супер, т.к. мы не знаем о конкретной конвертации поинтов.
+
+На текущий момент YT eETH слишком дорогой (но если вы заходили со мной по 1 к 20 и не вышли, то у вас отличная твх), можно подождать не много, пока откатится хотя бы до 1 к 17.
+
+Или, если вам сильно не терпится, заходить по дса. Комиссия сейчас позволяет это, занос в Пендл обходится в ~35-50$.
+
+Если у вас сайз в 5-10 ЕТН+, можно закинуть просто в eETH, без пендла, а затем закинуть их в [Liquid](<a href="https://app.ether.fi/liquid" target="_blank" rel="noreferrer">https://app.ether.fi/liquid</a>), чтобы получать доп доходность и повышать уровни второго сезона, пока ожидаете лучшую твх для пендла.
+
+Так же, можно пойти на [ZeroLend](<a href="https://app.zerolend.xyz/reserve-overview/?underlyingAsset=0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee&amp;marketName=proto_mainnet_lrt_v3" target="_blank" rel="noreferrer">https://app.zerolend.xyz/reserve-overview/?underlyingAsset=0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee&amp;marketName=proto_mainnet_lrt_v3</a>) или [Sturdy](<a href="https://v2.sturdy.finance/aggregators/mode/0xd60DD6981Ec336fDa40820f8cA5E99CD17dD25A0/deposit" target="_blank" rel="noreferrer">https://v2.sturdy.finance/aggregators/mode/0xd60DD6981Ec336fDa40820f8cA5E99CD17dD25A0/deposit</a>) и залупить (это нормальное слово) свои eETH, чтобы получить плечо без использования пендла и сжигания.
+
+<code class="block">Нужно это делать только в том случае, если вы понимаете, что это такое и осознаете риски ликвидации или например теоретического депега weETH.</code>
+
+[Для сквада](<a href="https://www.notion.so/2top/Ether-Fi-d3971feb288b4d4b8a5976057af48c7a" target="_blank" rel="noreferrer">https://www.notion.so/2top/Ether-Fi-d3971feb288b4d4b8a5976057af48c7a</a>)
+[Для ретро](<a href="https://www.notion.so/2top/Ether-Fi-85e7b09522dd48fc9202dd438cc7c92a" target="_blank" rel="noreferrer">https://www.notion.so/2top/Ether-Fi-85e7b09522dd48fc9202dd438cc7c92a</a>)
+
+&lt;@&amp;829341057190723595&gt;  &lt;@&amp;881829120173035551&gt;  &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">21</span></span><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">12</span></span><span class="reaction-wrapper"><span class="reaction-emoji">😁</span><span class="count">1</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">21/03/2024, 17:17:00</span></h2><div class="message"><p>Касательно остальных проектов, по прежнему львиную долю ЕТН, можно отправить просто в Renzo, а затем в Zircuit (без YT/Pendle), если у вас хорошие объемы и вы не хотите сжигать ЕТН.
+
+Для лоудепов же стоит рассматривать только YT (или предыдущий пункт, если вы не понимаете, что это такое и где искать ezETH), по расчетам Ильи в посту выше <a href="https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844</a>.
+
+Стратегия заноса тоже может быть по дса - набрать часть сейчас и часть, например, через неделю, когда будет откат, потому что сейчас все еще дороговато.
+
+Так же, можно сэкономить и закупить YT на одном акке, после чего раскинуть на несколько, но я не рекомендую делать это на основных кошелях, разве что на 1-2, т.к. бритье по связкам от будущих проектов никто не отменял. Хотя за пару акков вряд ли что-то будет.
+
+Сам я занес в YT ezETH в сети Eth и YT ezETH Zircuit.
+Для YT ezETH в Арбитруме и YT eETH пока жду отката.
+
+&lt;@&amp;829341057190723595&gt;   &lt;@&amp;881829120173035551&gt;   &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">45</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">3</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"><span class="jump" data-jump="1220388129912127651">Jump to reply</span><span class="user"><span class="reply-avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></span><span class="reply-username" title="#0">feeeniqs</span></span><span class="reply-contents"><p><b>Второй сезон от Ether.fi: StakeRank</b>
+
+Выкатили более четкие критерии для стейкеров:
+- StakeRank это система, состоящая из 10 уровней.
+- Она основана на том, как долго вы стейкаете.
+- Каждый “StakeRank” уровень дает множитель, увеличивающий поинты за каждый ЕТН.
+- После каждой 1 недели стейкинга eETH разблокируеся следующий уровень StakeRank.
+- Клейм уровня стоит 5 ETHFI (~20$ на текущий момент)
+- Все, кто заклеймили ETHFI после первого сезона, начнут со второго уровня.
+- Если вы холдите нфт, то можете увеличить уровень, в зависимости от тира нфт: брозна - 1, серебро - 2, золото 3, платина - 4.
+- И конечно лидерборд.
+
+В общем, выглядит не плохо, но и не супер, т.к. мы не знаем о конкретной конвертации поинтов.
+
+На текущий момент YT eETH слишком дорогой (но если вы заходили со мной по 1 к 20 и не вышли, то у вас отличная твх), можно подождать не много, пока откатится хотя бы до 1 к 17.
+
+Или, если вам сильно не терпится, заходить по дса. Комиссия сейчас позволяет это, занос в Пендл обходится в ~35-50$.
+
+Если у вас сайз в 5-10 ЕТН+, можно закинуть просто в eETH, без пендла, а затем закинуть их в [Liquid](<a href="https://app.ether.fi/liquid" target="_blank" rel="noreferrer">https://app.ether.fi/liquid</a>), чтобы получать доп доходность и повышать уровни второго сезона, пока ожидаете лучшую твх для пендла.
+
+Так же, можно пойти на [ZeroLend](<a href="https://app.zerolend.xyz/reserve-overview/?underlyingAsset=0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee&amp;marketName=proto_mainnet_lrt_v3" target="_blank" rel="noreferrer">https://app.zerolend.xyz/reserve-overview/?underlyingAsset=0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee&amp;marketName=proto_mainnet_lrt_v3</a>) или [Sturdy](<a href="https://v2.sturdy.finance/aggregators/mode/0xd60DD6981Ec336fDa40820f8cA5E99CD17dD25A0/deposit" target="_blank" rel="noreferrer">https://v2.sturdy.finance/aggregators/mode/0xd60DD6981Ec336fDa40820f8cA5E99CD17dD25A0/deposit</a>) и залупить (это нормальное слово) свои eETH, чтобы получить плечо без использования пендла и сжигания.
+
+<code class="block">Нужно это делать только в том случае, если вы понимаете, что это такое и осознаете риски ликвидации или например теоретического депега weETH.</code>
+
+[Для сквада](<a href="https://www.notion.so/2top/Ether-Fi-d3971feb288b4d4b8a5976057af48c7a" target="_blank" rel="noreferrer">https://www.notion.so/2top/Ether-Fi-d3971feb288b4d4b8a5976057af48c7a</a>)
+[Для ретро](<a href="https://www.notion.so/2top/Ether-Fi-85e7b09522dd48fc9202dd438cc7c92a" target="_blank" rel="noreferrer">https://www.notion.so/2top/Ether-Fi-85e7b09522dd48fc9202dd438cc7c92a</a>)
+
+&lt;@&amp;829341057190723595&gt;  &lt;@&amp;881829120173035551&gt;  &lt;@&amp;1196944878505054258&gt;</p></span></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">21/03/2024, 17:49:11</span></h2><div class="message"><p><b>Апдейт по Ether.fi: StakeRank</b>
+
+Второй сезон еще не стартовал и это пока была лишь форма для опроса пользователей, с предложениями перечисленными выше. 
+
+Поэтому, переходим на [страницу](<a href="https://app.ether.fi/feedback" target="_blank" rel="noreferrer">https://app.ether.fi/feedback</a>) с формой, выставляем рейтинг и сабмитим отзыв. Можно еще дописать свои пожелания, например, чтобы они шепнули нам лично пропорцию конвертации поинтов и мы могли основательно обмазаться YT.
+
+Жду твх в YT.
+
+&lt;@&amp;829341057190723595&gt;   &lt;@&amp;881829120173035551&gt;   &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">🫡</span><span class="count">33</span></span><span class="reaction-wrapper"><span class="reaction-emoji">😂</span><span class="count">6</span></span><span class="reaction-wrapper"><span class="reaction-emoji">✅</span><span class="count">1</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"><span class="jump" data-jump="1220209912932597844">Jump to reply</span><span class="user"><span class="reply-avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></span><span class="reply-username" title="#0">g0od_mo0d</span></span><span class="reply-contents"><p><b>YT ezETH</b>
+
+Сделал таблицу с расчетом выгодности различных пулов YT ezETH.
+
+Вы должны понимать, что в этих расчетах минимум фактов и максимум фантазии. Так что относитесь скептически. 
+Но соотношение цифр должно приблизительно соответствовать.
+
+Почему цифры такие? - Я художник.
+Но вы можете подставить свои.
+[Ссылка на таблицу](<a href="https://docs.google.com/spreadsheets/d/1t1HtBJQ4YxbpcsfVPgm3bXX1Fxum53fyfpgbI8ku6iM/edit?usp=sharing" target="_blank" rel="noreferrer">https://docs.google.com/spreadsheets/d/1t1HtBJQ4YxbpcsfVPgm3bXX1Fxum53fyfpgbI8ku6iM/edit?usp=sharing</a>)
+
+Быстренько пройдусь по каждому из них:
+
+<b>- 25 Apr 2024 Eth</b>
+Самые короткие. Полностью обесценятся через 35 дней.
+Но за это время вы заработаете ~$13K от двух дропов. Вычитайте отсюда утерянный ETH.
+
+<b>- 27 Jun 2024 Arb</b>
+Длинные. Тут вы скорей всего не потеряете все, как в первом случае. И по примеру EETH сможете забрать 70-50% от вложений.
+Заработок, за 98 дней может составить 9170$
+
+<b>- 27 Jun 2024 Zircuit</b>
+Если в первых двух мультипликатор 2х давался на поинты Renzo, то тут он дается на Zircuit.
+И к сожалению я не могу посчитать стоимость дропа даже приблизительно.
+Пишите свои варианты в чате.
+Но я уверен, что выйти с оценкой меньше, чем Renzo, Zircuit не сможет. Главный вопрос - на сколько ваши поинты размоются рефоводами.
+Сделаю допущение, что по итогу этот YT окажется по прибыльности примерно, как второй.
+Но у этого есть преимущество. Т.к. тут заложено сразу 3 дропа, он может почти не обесценится при выходе любого из них и вы сможете выйти около нуля.
+Скорей всего дроп от Renzo выйдет раньше, чем дроп от Zircuit. Поэтому фармить именно Zircuit с х2 и в долгую, может быть более выгодно.
+
+<b>Вывод:</b>
+Я разделил выделенное на YT на 2 части.
+40% я сожгу в "25 Apr 2024 Eth"
+60% я положил и постараюсь спасти в "27 Jun 2024 Zircuit"
+
+<i>_Что надо знать:_</i>
+- Сейчас пик хайпа YT. Если покупаете сейчас, то покупаете на хаях.
+- Выгодно ли ждать, зависит от того, когда упадет цена. Для покупки коротких ждать точно не выгодно, т.к. они будут обесцениваться каждый день.
+Если нацелены на длинные, то можете подождать. Они могут подешеветь, а могут и нет.
+- Если вы все еще не умеете пользоваться Pendle и не знаете, что такое YT, вот видео:
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt;
+<a href="https://www.notion.so/2top/Pendle-9ee04d59717b46e0b14c6006bc0a5019?pvs=4" target="_blank" rel="noreferrer">https://www.notion.so/2top/Pendle-9ee04d59717b46e0b14c6006bc0a5019?pvs=4</a>
+ &lt;@&amp;881829120173035551&gt;
+<a href="https://www.notion.so/2top/Pendle-a7c06b4318fd430dba9a69a2b8eb45fc?pvs=4" target="_blank" rel="noreferrer">https://www.notion.so/2top/Pendle-a7c06b4318fd430dba9a69a2b8eb45fc?pvs=4</a></p></span></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></div><div><h2><strong class="username" title="#0">g0od_mo0d</strong><span class="info time">22/03/2024, 08:23:06</span></h2><div class="message"><p><b>Kelp/Swell</b>
+
+Добавил в [таблицу с расчетами](<a href="https://docs.google.com/spreadsheets/d/1t1HtBJQ4YxbpcsfVPgm3bXX1Fxum53fyfpgbI8ku6iM/edit#gid=334072548" target="_blank" rel="noreferrer">https://docs.google.com/spreadsheets/d/1t1HtBJQ4YxbpcsfVPgm3bXX1Fxum53fyfpgbI8ku6iM/edit#gid=334072548</a>) Kelp и Swell.
+
+- Swell самые не прозрачные. Вроде начисляют 2 Pearl/day/ETH. Но это приблизительно.
+Торгуются уже на Whales по 0.5$/Pearl.
+Поэтому тут можно легко прикинуть профитность. 
+С одного rswETH YT вы заработаете за 3 месяца 4,365$ дропом SWELL и еще 3500$ в EL.
+Суммарно $7&nbsp;857
+Они скоро запустят свою сеть и туда можно будет отправить ALT для фарма.
+
+- Kelp. Я для них чуть занизил FDV, до $1.5B. Уже говорил, что пока они для меня одни из самых унылых.
+С короткими YT у меня вышло общего профита в 6,610$
+С длинными 9,155$.
+
+Итог:
+Все еще придерживаюсь Renzo, как описывал в первом посте.
+
+&lt;@&amp;829341057190723595&gt;   &lt;@&amp;881829120173035551&gt;   &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">40</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">3</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></div><div><h2><strong class="username" title="#0">g0od_mo0d</strong><span class="info time">22/03/2024, 08:23:59</span></h2><div class="message"><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1220618965383123065/image.png?ex=66220dff&amp;is=660f98ff&amp;hm=096988dc32e95c03d0100ab840f05641eb30de40f1b535a35973cc7938e24db4&amp;" class="embed download">Download image.png?ex=66220dff&amp;is=660f98ff&amp;hm=096988dc32e95c03d0100ab840f05641eb30de40f1b535a35973cc7938e24db4&amp;</a><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1220618965706080286/image.png?ex=66220dff&amp;is=660f98ff&amp;hm=46c55dce6088219cd3d3b6ce3333d21d38e2a045626a70bd686e4f1eb642cbe0&amp;" class="embed download">Download image.png?ex=66220dff&amp;is=660f98ff&amp;hm=46c55dce6088219cd3d3b6ce3333d21d38e2a045626a70bd686e4f1eb642cbe0&amp;</a></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">5</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/8d4d8f65a8022ea71792789aba8f3546.webp"></div><div><h2><strong class="username" title="#0">hexdrunker</strong><span class="info time">22/03/2024, 14:59:56</span></h2><div class="message"><p><b>Как и где я стейкаю эфиры</b>
+
+<b>Предистория</b>
+Держал ефиры в ether.fi, также фармил чуть через YT, и очень остался доволен результатом. На этой неделе активно перекладывал и перестейкивал все. Поэтому информация максимально актуальная на сегодняшний день. Если вы вдруг еще не стейкали ничего - самое время начать после прочтения этого поста. Если у вас нет эфира и вы бы хотели его купить и начать стейкать - самое время.
+
+<b>Дисклеймер</b>
+Комиссии в сети эфира достигают иногда 50-100 долларов за транзакцию и с маленьким депозитом я бы не советовал в это лезть, кроме покупки YT-токенов.
+
+<b>Где же мои эфиры</b>
+
+<b>1. Продолжаю фармить в BLAST</b>
+С первого дня как он запустился. На запуске мейннета закинул туда еще и все стейблы, что у меня были и юзал протоколы и фармил голду и поинты. Пару дней назад перевел стейблы в эфир, и весь эфир закинул в LP ezETH - ETH на трастер - <a href="https://app.thruster.finance/add" target="_blank" rel="noreferrer">https://app.thruster.finance/add</a>. Для того, чтобы это сделать, прям там на [сайте](<a href="https://app.thruster.finance/" target="_blank" rel="noreferrer">https://app.thruster.finance/</a>)  свапаете половину эфира в ezETH. и дальше добавляете в пул. Можете в fullrange, я закинул в 20%, если что, пул с 0.30% fee tier. Как на первом скриншоте. После чего относите свою LP на [hyperlock](<a href="https://app.hyperlock.finance/" target="_blank" rel="noreferrer">https://app.hyperlock.finance/</a>). 
+<b>Реф ссылки с плюшками:</b>
+- <a href="https://blast.io/J025F" target="_blank" rel="noreferrer">https://blast.io/J025F</a>
+- <a href="https://app.thruster.finance/ref/BC5AN2" target="_blank" rel="noreferrer">https://app.thruster.finance/ref/BC5AN2</a>
+
+<b>2. Swell on Karak / Zircuit</b>
+У меня были токены swell eth, которые я обернул в rswETH и затем отнес в zircuit и karak, в целом Илья уже про них писал многое, но т.к. у меня они лежали на кошельках, принял решение их оставить. Свелл уверенный топ-7 протокол ЛСД, у которого есть лрт єфира, и он есть во многих протоколах, которые построены поверх. Там все просто. Если есть у вас rswETH то идете по ссылкам ниже и заносите их в протоколы. Если нет, то просто покупаете с рынка, либо минтите на сайте свела.
+<b>Реф ссылки с плюшками:</b>
+- <a href="https://app.swellnetwork.io/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837" target="_blank" rel="noreferrer">https://app.swellnetwork.io?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837</a>
+- <a href="https://stake.zircuit.com/?ref=tpa1f4" target="_blank" rel="noreferrer">https://stake.zircuit.com/?ref=tpa1f4</a>
+- <a href="https://karak.network/karak-xp" target="_blank" rel="noreferrer">https://karak.network/karak-xp</a>, код для карак <code class="inline">3xAza</code> 
+
+<b>3. Direct staking on EigenLayer</b>
+С момента как открылись пулы на ейгене я закинул еще очень давно туда немного rETH (rocketpool) и с того момента не трогал, решил, что хоть какое-то прямое касание с ейгеном стоит оставить, на всякий случай. Я этими эфирами конкретно недозарабатываю другие поинты, но мне хочется их не трогать. В общем, не советую так делать. 
+
+<b>4. Puffer</b>
+Протокол от слейшинга, бинанс на борту, TVL 1.27B - все что я знаю и мне достаточно. Фармлю там с первого дня. Думаю, выйдем на ланчпуле бинанса по оценке в 5-10 лярдов и с капой в районе 500м.
+<b>Реф ссылка с плюшками:</b>
+<a href="https://quest.puffer.fi/chapter1?invite_code=radisT_Trus" target="_blank" rel="noreferrer">https://quest.puffer.fi/chapter1?invite_code=radisT_Trus</a>
+
+<b>5. Renzo &amp; Blackwing</b>
+Blackwing - 1 ролап на initia. Ресерч - <a href="https://teletype.in/@levdeviatkin/initia" target="_blank" rel="noreferrer">https://teletype.in/@levdeviatkin/initia</a>. Бинанс на борту + крутые ангелы. Выглядит как андеррадар. Фармим.
+<b>Рефки смотрим тут:</b>
+<span class="link mention-chat">#1215688937318776894</span> 
+- Сначала идем сюда <a href="https://app.renzoprotocol.com/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837" target="_blank" rel="noreferrer">https://app.renzoprotocol.com/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837</a>
+- Потом тут закидываем <a href="https://blackwing.fi/earn" target="_blank" rel="noreferrer">https://blackwing.fi/earn</a>
+
+<b>6. Renzo (ezETH) + Zircuit</b>
+<b>Большая часть стека именно тут, все просто:</b>
+- берем ezETH. тут <a href="https://app.renzoprotocol.com/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837" target="_blank" rel="noreferrer">https://app.renzoprotocol.com/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837</a>
+- относим его сюда <a href="https://stake.zircuit.com/?ref=tpa1f4" target="_blank" rel="noreferrer">https://stake.zircuit.com/?ref=tpa1f4</a>
+
+<b>7. ULTRADEGEN MODE - YT</b>
+После уверенного выхода ether.fi YT выглядят еще вкуснее, психанул и на часть эфира (до 5% общего) купил токены доходности, про которые расписывал Илья тут - <a href="https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844</a>. Если коротко, делите то, что готовы полностью сжечь с целью получение ебейшего дропа на 2 части, после чего:
+- 50% сюда - <a href="https://app.pendle.finance/trade/markets/0xd7e0809998693fd87e81d51de1619fd0ee658031/swap?view=yt&amp;chain=ethereum&amp;py=input" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xd7e0809998693fd87e81d51de1619fd0ee658031/swap?view=yt&amp;chain=ethereum&amp;py=input</a>
+- 50% сюда - <a href="https://app.pendle.finance/trade/markets/0xde715330043799d7a80249660d1e6b61eb3713b3/swap?view=yt&amp;chain=ethereum&amp;py=input" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xde715330043799d7a80249660d1e6b61eb3713b3/swap?view=yt&amp;chain=ethereum&amp;py=input</a>
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt;</p><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1220718610813550672/image.png?ex=66226acc&amp;is=660ff5cc&amp;hm=29aea54625325099b442fb8fce45f6cb9dff0ff50c95f8447f7b5e767655d8db&amp;" class="embed download">Download image.png?ex=66226acc&amp;is=660ff5cc&amp;hm=29aea54625325099b442fb8fce45f6cb9dff0ff50c95f8447f7b5e767655d8db&amp;</a></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">32</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">7</span></span><span class="reaction-wrapper"><img src="./Discord Offline History_files/922061533444460554.png" alt=":3efb773515f2ae34bb91fa1f9ecce8ce:" title=":3efb773515f2ae34bb91fa1f9ecce8ce:" class="reaction-emoji-custom"><span class="count">2</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"><span class="jump" data-jump="1220718610603966514">Jump to reply</span><span class="user"><span class="reply-avatar"><img src="./Discord Offline History_files/8d4d8f65a8022ea71792789aba8f3546.webp"></span><span class="reply-username" title="#0">hexdrunker</span></span><span class="reply-contents"><p><b>Как и где я стейкаю эфиры</b>
+
+<b>Предистория</b>
+Держал ефиры в ether.fi, также фармил чуть через YT, и очень остался доволен результатом. На этой неделе активно перекладывал и перестейкивал все. Поэтому информация максимально актуальная на сегодняшний день. Если вы вдруг еще не стейкали ничего - самое время начать после прочтения этого поста. Если у вас нет эфира и вы бы хотели его купить и начать стейкать - самое время.
+
+<b>Дисклеймер</b>
+Комиссии в сети эфира достигают иногда 50-100 долларов за транзакцию и с маленьким депозитом я бы не советовал в это лезть, кроме покупки YT-токенов.
+
+<b>Где же мои эфиры</b>
+
+<b>1. Продолжаю фармить в BLAST</b>
+С первого дня как он запустился. На запуске мейннета закинул туда еще и все стейблы, что у меня были и юзал протоколы и фармил голду и поинты. Пару дней назад перевел стейблы в эфир, и весь эфир закинул в LP ezETH - ETH на трастер - <a href="https://app.thruster.finance/add" target="_blank" rel="noreferrer">https://app.thruster.finance/add</a>. Для того, чтобы это сделать, прям там на [сайте](<a href="https://app.thruster.finance/" target="_blank" rel="noreferrer">https://app.thruster.finance/</a>)  свапаете половину эфира в ezETH. и дальше добавляете в пул. Можете в fullrange, я закинул в 20%, если что, пул с 0.30% fee tier. Как на первом скриншоте. После чего относите свою LP на [hyperlock](<a href="https://app.hyperlock.finance/" target="_blank" rel="noreferrer">https://app.hyperlock.finance/</a>). 
+<b>Реф ссылки с плюшками:</b>
+- <a href="https://blast.io/J025F" target="_blank" rel="noreferrer">https://blast.io/J025F</a>
+- <a href="https://app.thruster.finance/ref/BC5AN2" target="_blank" rel="noreferrer">https://app.thruster.finance/ref/BC5AN2</a>
+
+<b>2. Swell on Karak / Zircuit</b>
+У меня были токены swell eth, которые я обернул в rswETH и затем отнес в zircuit и karak, в целом Илья уже про них писал многое, но т.к. у меня они лежали на кошельках, принял решение их оставить. Свелл уверенный топ-7 протокол ЛСД, у которого есть лрт єфира, и он есть во многих протоколах, которые построены поверх. Там все просто. Если есть у вас rswETH то идете по ссылкам ниже и заносите их в протоколы. Если нет, то просто покупаете с рынка, либо минтите на сайте свела.
+<b>Реф ссылки с плюшками:</b>
+- <a href="https://app.swellnetwork.io/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837" target="_blank" rel="noreferrer">https://app.swellnetwork.io?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837</a>
+- <a href="https://stake.zircuit.com/?ref=tpa1f4" target="_blank" rel="noreferrer">https://stake.zircuit.com/?ref=tpa1f4</a>
+- <a href="https://karak.network/karak-xp" target="_blank" rel="noreferrer">https://karak.network/karak-xp</a>, код для карак <code class="inline">3xAza</code> 
+
+<b>3. Direct staking on EigenLayer</b>
+С момента как открылись пулы на ейгене я закинул еще очень давно туда немного rETH (rocketpool) и с того момента не трогал, решил, что хоть какое-то прямое касание с ейгеном стоит оставить, на всякий случай. Я этими эфирами конкретно недозарабатываю другие поинты, но мне хочется их не трогать. В общем, не советую так делать. 
+
+<b>4. Puffer</b>
+Протокол от слейшинга, бинанс на борту, TVL 1.27B - все что я знаю и мне достаточно. Фармлю там с первого дня. Думаю, выйдем на ланчпуле бинанса по оценке в 5-10 лярдов и с капой в районе 500м.
+<b>Реф ссылка с плюшками:</b>
+<a href="https://quest.puffer.fi/chapter1?invite_code=radisT_Trus" target="_blank" rel="noreferrer">https://quest.puffer.fi/chapter1?invite_code=radisT_Trus</a>
+
+<b>5. Renzo &amp; Blackwing</b>
+Blackwing - 1 ролап на initia. Ресерч - <a href="https://teletype.in/@levdeviatkin/initia" target="_blank" rel="noreferrer">https://teletype.in/@levdeviatkin/initia</a>. Бинанс на борту + крутые ангелы. Выглядит как андеррадар. Фармим.
+<b>Рефки смотрим тут:</b>
+<span class="link mention-chat">#1215688937318776894</span> 
+- Сначала идем сюда <a href="https://app.renzoprotocol.com/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837" target="_blank" rel="noreferrer">https://app.renzoprotocol.com/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837</a>
+- Потом тут закидываем <a href="https://blackwing.fi/earn" target="_blank" rel="noreferrer">https://blackwing.fi/earn</a>
+
+<b>6. Renzo (ezETH) + Zircuit</b>
+<b>Большая часть стека именно тут, все просто:</b>
+- берем ezETH. тут <a href="https://app.renzoprotocol.com/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837" target="_blank" rel="noreferrer">https://app.renzoprotocol.com/?ref=0x1aee0c72ae7b4a92eb22a37f34d39de0c306f837</a>
+- относим его сюда <a href="https://stake.zircuit.com/?ref=tpa1f4" target="_blank" rel="noreferrer">https://stake.zircuit.com/?ref=tpa1f4</a>
+
+<b>7. ULTRADEGEN MODE - YT</b>
+После уверенного выхода ether.fi YT выглядят еще вкуснее, психанул и на часть эфира (до 5% общего) купил токены доходности, про которые расписывал Илья тут - <a href="https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844</a>. Если коротко, делите то, что готовы полностью сжечь с целью получение ебейшего дропа на 2 части, после чего:
+- 50% сюда - <a href="https://app.pendle.finance/trade/markets/0xd7e0809998693fd87e81d51de1619fd0ee658031/swap?view=yt&amp;chain=ethereum&amp;py=input" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xd7e0809998693fd87e81d51de1619fd0ee658031/swap?view=yt&amp;chain=ethereum&amp;py=input</a>
+- 50% сюда - <a href="https://app.pendle.finance/trade/markets/0xde715330043799d7a80249660d1e6b61eb3713b3/swap?view=yt&amp;chain=ethereum&amp;py=input" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xde715330043799d7a80249660d1e6b61eb3713b3/swap?view=yt&amp;chain=ethereum&amp;py=input</a>
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt;</p></span></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/8d4d8f65a8022ea71792789aba8f3546.webp"></div><div><h2><strong class="username" title="#0">hexdrunker</strong><span class="info time">22/03/2024, 15:02:18</span><span class="info edited">Edited 22/03/2024, 15:04:56</span></h2><div class="message"><p><b>Что делать, если вы не TVL-бояре</b>
+
+Если ваш бюджет на стейкинг в районе 0.3-0.5-1 эфира, то просто повторите 7 пункт, скоро будет пост в канале GT3. 
+
+Я думаю, что рассчеты <span class="link mention-user" title="#0">@g0od_mo0d</span> (<a href="https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844</a>) очень близки к тому, что будет в реальности. Даже, если будет в 2 раза хуже - это все еще очень хорошо. 
+
+В глубине души хочется на все деньги скупить YT токенов и сидеть ждать дропа, но... риск-менеджмент, никто не отменял. 
+
+----------------
+
+Также, не стоит забывать, что эфир нужен почти всегда. На дегенки. На сейлы. Просто как залог для займа на лендинге и так далее. Часть эфира остается ликвидным. Зашел на неплохой сайз в Aethir пул сквада. Держу еще часть для откупа каких-то НФТ (возможно), либо просто, для дегенок из ончейна. Про это тоже не забывайте.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">49</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">4</span></span><span class="reaction-wrapper"><img src="./Discord Offline History_files/922061533444460554.png" alt=":3efb773515f2ae34bb91fa1f9ecce8ce:" title=":3efb773515f2ae34bb91fa1f9ecce8ce:" class="reaction-emoji-custom"><span class="count">1</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">23/03/2024, 04:45:49</span><span class="info edited">Edited 27/03/2024, 08:23:21</span></h2><div class="message"><p><b>Сделал супер-бомжей в YT</b>
+
+Купив [YT eETH Arbitrum](<a href="https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output</a>) на 32 дня - за 0.1 ЕТН получаем 2.99 YT, с которыми мы наберем:
+- 717.6 EL поинтов за 10 дней (у Altlayer минимальный тир был начинался от 720 поинтов)
+- 1000 EL поинтов за 14 дней (просто ровное число)
+- 2296 EL поинтов за весь период.
+
+Бонусом идут поинты Ether.fi для второго сезона, а так же дешевая комса ($0.03).
+ 
+Так же, не обязательно держать YT до конца. Если вы, например, раскидывали YT с <b>одного нового акка на другие (тоже новые, да)</b>,  и вам хватит 720-1000 поинтов, то можно собрать всё на один акк и дальше фармить плотно на нём (либо продать, если не будет хватать ликвы на еду)
+
+Обсужение тут <span class="link mention-chat">#EigenLayer | Зелёная миля</span> 
+
+&lt;@&amp;829341057190723595&gt;    &lt;@&amp;881829120173035551&gt;    &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">28</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">23/03/2024, 08:37:42</span><span class="info edited">Edited 26/03/2024, 04:22:21</span></h2><div class="message"><p><b>Второй сезон Ether.fi стартовал.</b>
+
+Второй сезон уже проходит с 15 марта и продлится до 30 июня. На него все так же выделено 5% саплая - очень жирно.
+
+StakeRank начнется 25 марта 2024 года.
+
+- StakeRank увеличивает поинты в зависимости от срока стейка (чем дольше, тем больше).
+- StakeRank будет иметь 8 уровней/рангов.
+- Пользователи продвигаются на 1 уровень каждые 100 часов холда eETH.
+- Каждый уровень имеет большую прибавку к поинтам.
+- Буст будет работать на новые поинты, заработанные после достижения нового уровня.
+- Баланс должен быть более 0.1 eETH, чтобы продолжать продвигаться по уровням.
+- Юзеры из первого сезона начинают сразу со второго уровня. 
+- Повышение уровня будет варьироваться от 1-2х.
+- Холдеры Ether.Fan NFT повышаются до 3 уровня. Это действует только один раз.
+- Все участники получат 10х для зарабатываемые поинты.
+
+Чтобы получить сразу второй уровень и претендовать на дроп во втором сезоне, нужно соответствовать условиям:
+1. Юзеры, которые вывели свои ЕТН или большую часть - их поинты первого сезона не принесут дроп во втором сезоне, если они не застейкают дополнительные ЕТН во втором сезоне (замазывают). 
+2. Если &gt;70% ваших поинтов были получены в первом сезоне, вы не будете иметь право на получение дропа за второй (и снова замазывают).
+3. Юзеры, которые вывели средства не за долго до завершения второго сезона, не будут иметь право на дроп во втором. Но если ваши YT сгорают, то это не считается.
+
+Итак, что мы имеем:
+- 10х через Пендл превращаются в 20х.
+- Вы должны сами посчитать, сколько вам нужно набить поинтов, чтобы это было более 31%, исходя из п.2 выше. При чем х10 поинты стали считаться начиная с 15 марта.
+<code class="block">За 1 еЕТН получаем 10000 поинтов в сутки. За 1 YT - 20000.</code>
+
+Вижу два варианта для участия, которые стоит объединить:
+- [YT eETH](<a href="https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output</a>) - за 1 ЕТН получаем 15.48 YT на 95 дней, т.е. сжигание произойдет за 3 дня до завершения второго сезона, что очень хорошо, так как мы будем фармить поинты длительное время и на максимальном уровне/бусте. Это именно то, что поощряется Ether.fi.
+- [YT eETH в Arbitrum](<a href="https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output</a>) - за 1 ЕТН получаем 29.19 YT (уже подорожал) на 32 дня. Тоже выглядит хорошо.
+
+Я разделил стек 70/30, в пользу обычного YT eETH (в эфире), т.к. они в итоге должны принести существенно больше поинтов.
+
+&lt;@&amp;829341057190723595&gt;  &lt;@&amp;881829120173035551&gt;  &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">16</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">2</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"><span class="jump" data-jump="1220984805873942578">Jump to reply</span><span class="user"><span class="reply-avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></span><span class="reply-username" title="#0">feeeniqs</span></span><span class="reply-contents"><p><b>Второй сезон Ether.fi стартовал.</b>
+
+Второй сезон уже проходит с 15 марта и продлится до 30 июня. На него все так же выделено 5% саплая - очень жирно.
+
+StakeRank начнется 25 марта 2024 года.
+
+- StakeRank увеличивает поинты в зависимости от срока стейка (чем дольше, тем больше).
+- StakeRank будет иметь 8 уровней/рангов.
+- Пользователи продвигаются на 1 уровень каждые 100 часов холда eETH.
+- Каждый уровень имеет большую прибавку к поинтам.
+- Буст будет работать на новые поинты, заработанные после достижения нового уровня.
+- Баланс должен быть более 0.1 eETH, чтобы продолжать продвигаться по уровням.
+- Юзеры из первого сезона начинают сразу со второго уровня. 
+- Повышение уровня будет варьироваться от 1-2х.
+- Холдеры Ether.Fan NFT повышаются до 3 уровня. Это действует только один раз.
+- Все участники получат 10х для зарабатываемые поинты.
+
+Чтобы получить сразу второй уровень и претендовать на дроп во втором сезоне, нужно соответствовать условиям:
+1. Юзеры, которые вывели свои ЕТН или большую часть - их поинты первого сезона не принесут дроп во втором сезоне, если они не застейкают дополнительные ЕТН во втором сезоне (замазывают). 
+2. Если &gt;70% ваших поинтов были получены в первом сезоне, вы не будете иметь право на получение дропа за второй (и снова замазывают).
+3. Юзеры, которые вывели средства не за долго до завершения второго сезона, не будут иметь право на дроп во втором. Но если ваши YT сгорают, то это не считается.
+
+Итак, что мы имеем:
+- 10х через Пендл превращаются в 20х.
+- Вы должны сами посчитать, сколько вам нужно набить поинтов, чтобы это было более 31%, исходя из п.2 выше. При чем х10 поинты стали считаться начиная с 15 марта.
+<code class="block">За 1 еЕТН получаем 10000 поинтов в сутки. За 1 YT - 20000.</code>
+
+Вижу два варианта для участия, которые стоит объединить:
+- [YT eETH](<a href="https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output</a>) - за 1 ЕТН получаем 15.48 YT на 95 дней, т.е. сжигание произойдет за 3 дня до завершения второго сезона, что очень хорошо, так как мы будем фармить поинты длительное время и на максимальном уровне/бусте. Это именно то, что поощряется Ether.fi.
+- [YT eETH в Arbitrum](<a href="https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output</a>) - за 1 ЕТН получаем 29.19 YT (уже подорожал) на 32 дня. Тоже выглядит хорошо.
+
+Я разделил стек 70/30, в пользу обычного YT eETH (в эфире), т.к. они в итоге должны принести существенно больше поинтов.
+
+&lt;@&amp;829341057190723595&gt;  &lt;@&amp;881829120173035551&gt;  &lt;@&amp;1196944878505054258&gt;</p></span></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></div><div><h2><strong class="username" title="#0">g0od_mo0d</strong><span class="info time">23/03/2024, 08:59:38</span></h2><div class="message"><p><b>Long vs Short YT</b>
+
+Быстро посчитал на коленке, куда выгоднее закидывать. Короткие или длинные YT.
+
+Все расчеты с условиями:
+1 ETHFI = 1130 Points
+1 ETHFI = 4$
+EL points = 0.15$
+Важно: Это не точная математика, они лишь дает вам наглядное сравнение двух возможностей.
+
+- 25 Apr 2024 YT eETH 
+В токенах ETHFI мы получим примерно $10К. 
+В EL примерно 3445$
+Сумарно: $14К
+И 100% потерю ETH
+
+- 27 Jun 2024 YT eETH
+В токенах ETHFI мы получим примерно $17К. 
+В EL примерно 5184$
+Сумарно: $22К
+И при желание, частичный возврат средств.
+
+<i>_Мое решение:_</i>
+Я закинул все что хотел, в длинный пул.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;881829120173035551&gt; &lt;@&amp;1196944878505054258&gt;</p><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1220990327221915688/image.png?ex=662367da&amp;is=6610f2da&amp;hm=26e3c90b7bece70d1849873fd155222ccb72705e489ccae921de27647294a9a0&amp;" class="embed download">Download image.png?ex=662367da&amp;is=6610f2da&amp;hm=26e3c90b7bece70d1849873fd155222ccb72705e489ccae921de27647294a9a0&amp;</a></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">31</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">8</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">1</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"><span class="jump" data-jump="1220990327381426226">Jump to reply</span><span class="user"><span class="reply-avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></span><span class="reply-username" title="#0">g0od_mo0d</span></span><span class="reply-contents"><p><b>Long vs Short YT</b>
+
+Быстро посчитал на коленке, куда выгоднее закидывать. Короткие или длинные YT.
+
+Все расчеты с условиями:
+1 ETHFI = 1130 Points
+1 ETHFI = 4$
+EL points = 0.15$
+Важно: Это не точная математика, они лишь дает вам наглядное сравнение двух возможностей.
+
+- 25 Apr 2024 YT eETH 
+В токенах ETHFI мы получим примерно $10К. 
+В EL примерно 3445$
+Сумарно: $14К
+И 100% потерю ETH
+
+- 27 Jun 2024 YT eETH
+В токенах ETHFI мы получим примерно $17К. 
+В EL примерно 5184$
+Сумарно: $22К
+И при желание, частичный возврат средств.
+
+<i>_Мое решение:_</i>
+Я закинул все что хотел, в длинный пул.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;881829120173035551&gt; &lt;@&amp;1196944878505054258&gt;</p></span></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">23/03/2024, 09:36:17</span><span class="info edited">Edited 23/03/2024, 21:04:10</span></h2><div class="message"><p><b>Перекладываюсь в YT eETH Arbitrum.</b>
+
+В первом варианте мы зарабатываем 10к за месяц.
+Во втором варианте мы зарабатываем 17к за три месяца.
+
+Но это тонкий момент и мне нужно будет переливаться или просто докупать длинный YT, поэтому <b>вам лучше так не делать</b>.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;881829120173035551&gt; &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">27</span></span><span class="reaction-wrapper"><img src="./Discord Offline History_files/1154777327910256751.png" alt=":mee6Eth:" title=":mee6Eth:" class="reaction-emoji-custom"><span class="count">3</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">3</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"><span class="jump" data-jump="1220999547858321468">Jump to reply</span><span class="user"><span class="reply-avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></span><span class="reply-username" title="#0">feeeniqs</span></span><span class="reply-contents"><p><b>Перекладываюсь в YT eETH Arbitrum.</b>
+
+В первом варианте мы зарабатываем 10к за месяц.
+Во втором варианте мы зарабатываем 17к за три месяца.
+
+Но это тонкий момент и мне нужно будет переливаться или просто докупать длинный YT, поэтому <b>вам лучше так не делать</b>.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;881829120173035551&gt; &lt;@&amp;1196944878505054258&gt;</p></span></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">23/03/2024, 10:23:29</span><span class="info edited">Edited 23/03/2024, 21:25:18</span></h2><div class="message"><p>Я пока продолжу сидеть в коротком YT, т.к. вижу в этом возможность получить больше $/час, но позднее перейду в длинный YT. Не советую повторять за мной весь процесс.
+
+Для вас лучший вариант это [длинный YT](<a href="https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output</a>). Обменяли ЕТН на YT eETH и ждете дропа/следите за апдейтами.
+
+Так же, ожидаю переливания из рензо, в связи с чем жду подходящую твх на YT Renzo/Zircuit.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;881829120173035551&gt; &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">32</span></span><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">4</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤯</span><span class="count">1</span></span><span class="reaction-wrapper"><span class="reaction-emoji">✅</span><span class="count">2</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"><span class="jump" data-jump="1220388129912127651">Jump to reply</span><span class="user"><span class="reply-avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></span><span class="reply-username" title="#0">feeeniqs</span></span><span class="reply-contents"><p><b>Второй сезон от Ether.fi: StakeRank</b>
+
+Выкатили более четкие критерии для стейкеров:
+- StakeRank это система, состоящая из 10 уровней.
+- Она основана на том, как долго вы стейкаете.
+- Каждый “StakeRank” уровень дает множитель, увеличивающий поинты за каждый ЕТН.
+- После каждой 1 недели стейкинга eETH разблокируеся следующий уровень StakeRank.
+- Клейм уровня стоит 5 ETHFI (~20$ на текущий момент)
+- Все, кто заклеймили ETHFI после первого сезона, начнут со второго уровня.
+- Если вы холдите нфт, то можете увеличить уровень, в зависимости от тира нфт: брозна - 1, серебро - 2, золото 3, платина - 4.
+- И конечно лидерборд.
+
+В общем, выглядит не плохо, но и не супер, т.к. мы не знаем о конкретной конвертации поинтов.
+
+На текущий момент YT eETH слишком дорогой (но если вы заходили со мной по 1 к 20 и не вышли, то у вас отличная твх), можно подождать не много, пока откатится хотя бы до 1 к 17.
+
+Или, если вам сильно не терпится, заходить по дса. Комиссия сейчас позволяет это, занос в Пендл обходится в ~35-50$.
+
+Если у вас сайз в 5-10 ЕТН+, можно закинуть просто в eETH, без пендла, а затем закинуть их в [Liquid](<a href="https://app.ether.fi/liquid" target="_blank" rel="noreferrer">https://app.ether.fi/liquid</a>), чтобы получать доп доходность и повышать уровни второго сезона, пока ожидаете лучшую твх для пендла.
+
+Так же, можно пойти на [ZeroLend](<a href="https://app.zerolend.xyz/reserve-overview/?underlyingAsset=0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee&amp;marketName=proto_mainnet_lrt_v3" target="_blank" rel="noreferrer">https://app.zerolend.xyz/reserve-overview/?underlyingAsset=0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee&amp;marketName=proto_mainnet_lrt_v3</a>) или [Sturdy](<a href="https://v2.sturdy.finance/aggregators/mode/0xd60DD6981Ec336fDa40820f8cA5E99CD17dD25A0/deposit" target="_blank" rel="noreferrer">https://v2.sturdy.finance/aggregators/mode/0xd60DD6981Ec336fDa40820f8cA5E99CD17dD25A0/deposit</a>) и залупить (это нормальное слово) свои eETH, чтобы получить плечо без использования пендла и сжигания.
+
+<code class="block">Нужно это делать только в том случае, если вы понимаете, что это такое и осознаете риски ликвидации или например теоретического депега weETH.</code>
+
+[Для сквада](<a href="https://www.notion.so/2top/Ether-Fi-d3971feb288b4d4b8a5976057af48c7a" target="_blank" rel="noreferrer">https://www.notion.so/2top/Ether-Fi-d3971feb288b4d4b8a5976057af48c7a</a>)
+[Для ретро](<a href="https://www.notion.so/2top/Ether-Fi-85e7b09522dd48fc9202dd438cc7c92a" target="_blank" rel="noreferrer">https://www.notion.so/2top/Ether-Fi-85e7b09522dd48fc9202dd438cc7c92a</a>)
+
+&lt;@&amp;829341057190723595&gt;  &lt;@&amp;881829120173035551&gt;  &lt;@&amp;1196944878505054258&gt;</p></span></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></div><div><h2><strong class="username" title="#0">g0od_mo0d</strong><span class="info time">24/03/2024, 15:05:25</span></h2><div class="message"><p><b>Важно eETH YT</b>
+
+Еще раз подчеркну, то что Саша расписывал в правилах сезона:
+- Если вы участвовали в первой сезоне и получили поинты, то они просуммируются со вторым сезоном и так же подпадут уж под повторный дроп.
+- Вам надо нафармить во втором сезоне минимум 30% от тех поинтов, что вы нафармили в первом, что бы не быть побритым. Сделать это просто, т.к. закинув 1 eETH в длинный YT, до эксперации вы получите больше 50М поинтов.
+- Цену ETHFI поинтов почти не реально определить на текущий момент. Поэтому не понятно, что по итогу будет выгоднее фармить ezETH YT или eETH YT.
+- Рынок оценивает ezETH YT дороже, чем eETH YT. Вы можете спозиционировать себя в той же пропорции, что и рынок или же попробовать его переиграть.
+- Я думаю, что по итогу профит будет, с учетом текущих цен на разные YT, очень близкий.
+
+&lt;@&amp;829341057190723595&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">61</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"><span class="jump" data-jump="1220390717483126897">Jump to reply</span><span class="user"><span class="reply-avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></span><span class="reply-username" title="#0">feeeniqs</span></span><span class="reply-contents"><p>Касательно остальных проектов, по прежнему львиную долю ЕТН, можно отправить просто в Renzo, а затем в Zircuit (без YT/Pendle), если у вас хорошие объемы и вы не хотите сжигать ЕТН.
+
+Для лоудепов же стоит рассматривать только YT (или предыдущий пункт, если вы не понимаете, что это такое и где искать ezETH), по расчетам Ильи в посту выше <a href="https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1219198504430211122/1220209912932597844</a>.
+
+Стратегия заноса тоже может быть по дса - набрать часть сейчас и часть, например, через неделю, когда будет откат, потому что сейчас все еще дороговато.
+
+Так же, можно сэкономить и закупить YT на одном акке, после чего раскинуть на несколько, но я не рекомендую делать это на основных кошелях, разве что на 1-2, т.к. бритье по связкам от будущих проектов никто не отменял. Хотя за пару акков вряд ли что-то будет.
+
+Сам я занес в YT ezETH в сети Eth и YT ezETH Zircuit.
+Для YT ezETH в Арбитруме и YT eETH пока жду отката.
+
+&lt;@&amp;829341057190723595&gt;   &lt;@&amp;881829120173035551&gt;   &lt;@&amp;1196944878505054258&gt;</p></span></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">25/03/2024, 02:50:33</span></h2><div class="message"><p><b>Апдейт по твх в YT</b>
+
+- Если кто-то хотел докупить [YT ezETH (Zircuit)](<a href="https://app.pendle.finance/trade/markets/0xd7e0809998693fd87e81d51de1619fd0ee658031/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xd7e0809998693fd87e81d51de1619fd0ee658031/swap?view=yt&amp;chain=ethereum&amp;py=output</a>), сейчас не плохая возможность. Его пролили до 10.2 за 1 ЕТН.
+- Длинный Renzo [YT ezETH Arbitrum](<a href="https://app.pendle.finance/trade/markets/0x60712e3c9136cf411c561b4e948d4d26637561e7/swap?view=yt&amp;chain=arbitrum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0x60712e3c9136cf411c561b4e948d4d26637561e7/swap?view=yt&amp;chain=arbitrum&amp;py=output</a>) в арб на 93 дня всё еще дорогой - 1 к 8.6.
+- Короткий Renzo [YT ezETH Ethereum](<a href="https://app.pendle.finance/trade/markets/0x60712e3c9136cf411c561b4e948d4d26637561e7/swap?view=yt&amp;chain=arbitrum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0x60712e3c9136cf411c561b4e948d4d26637561e7/swap?view=yt&amp;chain=arbitrum&amp;py=output</a>) почти сразу откупили и твх опять не очень. Ждем. 
+
+Короткий YT еЕТН дорожает, а длинный дешевеет, так что если вы заходили со мной плотно в короткий, то у вас есть следующие варианты:
+- зафиксировать часть вместе с профитом и перелить в длинный (это значит продать в арбитруме и купить в етн)
+- зафиксировать всё и перелить в длинный (надеюсь не надо повторять)
+- продолжать холдить, если вы понимаете, для чего.
+
+Я сам часть зафиксировал и в итоге думаю оставить 70-30 в пользу длинного, как и планировал. Дальнейших апдейтов по этой теме давать не буду. Лучше напомню тезисы:
+- самый оптимальный вариант - это просто купить длинный и ждать дроп.
+- вы все заработаете на YT, вопрос только "как много?".
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;881829120173035551&gt; &lt;@&amp;1196944878505054258&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">58</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🫡</span><span class="count">10</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">8</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">1</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/d5b964f40c7cf75b81c311c8adb328cc.webp"></div><div><h2><strong class="username" title="#0">g0od_mo0d</strong><span class="info time">27/03/2024, 07:36:40</span></h2><div class="message"><p><b>Eigen Layer Mainet</b>
+
+В продолжение вчерашнего [сквадрума](<a href="https://discord.com/channels/829331298878750771/975751040987201536/1222290038604300402" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/975751040987201536/1222290038604300402</a>) о скором запуске EL DA и возможном выходе токена.
+Важно понимать, что это могут быть абсолютно не связанные события. Но тем не менее, если вы хотите сделать на это ставку, то есть один интересный способ.
+
+- Kelp токенизировал поинты EL и создал пул, через который вы можете их купить или продать.
+- KEP = 1 EL point
+- Цена одного KEP = 0.15$. [График](<a href="https://dexscreener.com/ethereum/0x837cf5b89916139baa0e57ffb0e35d7181c03ac6" target="_blank" rel="noreferrer">https://dexscreener.com/ethereum/0x837cf5b89916139baa0e57ffb0e35d7181c03ac6</a>)
+- Если EL выйдет сегодня и выделит на дроп 5% FDV, то при текущем количестве нафармленных поинтов, его MC составит $484М, а FDV $9.7B.
+- Я с трудом представляю, что бы EL вышел с оценкой ниже $20B - пессимистичный сценарий и $30B - оптимистичный сценарий.
+- Выходит, что текущая цена 1 EL point, недооценена минимум в два раза.
+- Я сделал очередную вкладку в [таблице](<a href="https://docs.google.com/spreadsheets/d/1t1HtBJQ4YxbpcsfVPgm3bXX1Fxum53fyfpgbI8ku6iM/edit#gid=1321861050" target="_blank" rel="noreferrer">https://docs.google.com/spreadsheets/d/1t1HtBJQ4YxbpcsfVPgm3bXX1Fxum53fyfpgbI8ku6iM/edit#gid=1321861050</a>), где вы можете рассчитать MC и FDV EihenLayer, в зависимости от даты выхода токена, при неизменном TVL и текущей цене EL point(0.15$).
+- Для примера, если TGE будет через 30 дней, то FDV=$12.6B. TGE через 60 дней, то FDV=$15.8B.
+- Как видите, то при текущей стоимости 1 поинты, ректануться будет довольно тяжело, даже если TGE произойдет в июне.
+- Так же поинты EL продаются на Whales Market.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt; &lt;@&amp;975739898936037408&gt;</p><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1222418997048246302/image.png?ex=661f5fe8&amp;is=660ceae8&amp;hm=c1076897ffca11062ae1e1025f9a70f26931059ed59458d1fde87fd6e751c1b0&amp;" class="embed download">Download image.png?ex=661f5fe8&amp;is=660ceae8&amp;hm=c1076897ffca11062ae1e1025f9a70f26931059ed59458d1fde87fd6e751c1b0&amp;</a><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1222418997270548480/image.png?ex=661f5fe8&amp;is=660ceae8&amp;hm=775ba446d9233293bc11c7c192bca7bff9163524a3f0264082b2c351a293ce5c&amp;" class="embed download">Download image.png?ex=661f5fe8&amp;is=660ceae8&amp;hm=775ba446d9233293bc11c7c192bca7bff9163524a3f0264082b2c351a293ce5c&amp;</a><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1222418997782380554/image.png?ex=661f5fe8&amp;is=660ceae8&amp;hm=00bd67f385acf030c2ad050efd53ae8b1af1fb3c3b86f0e37210f747db703776&amp;" class="embed download">Download image.png?ex=661f5fe8&amp;is=660ceae8&amp;hm=00bd67f385acf030c2ad050efd53ae8b1af1fb3c3b86f0e37210f747db703776&amp;</a><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1222418998067462184/image.png?ex=661f5fe8&amp;is=660ceae8&amp;hm=80002b60722f6cd3470b5eabc46dfaf6a5cbf9b81c0b96e1a8e3dd2cefaa4245&amp;" class="embed download">Download image.png?ex=661f5fe8&amp;is=660ceae8&amp;hm=80002b60722f6cd3470b5eabc46dfaf6a5cbf9b81c0b96e1a8e3dd2cefaa4245&amp;</a></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">71</span></span><span class="reaction-wrapper"><span class="reaction-emoji">💵</span><span class="count">2</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">29/03/2024, 06:50:06</span><span class="info edited">Edited 29/03/2024, 06:54:08</span></h2><div class="message"><p><b>Апдейт для бомж акков YT</b>
+
+Сначала добавлю касательно способов делать бомж-акки. У меня лично есть акки, на каждом из которых отдельно покупались YT, и есть новые, связанные, когда на одном акке покупаются YT и дальше раскидываются на другие.
+
+Плюс второго варианта в скорости фарма поинтов на случай скорого выхода EL или побочных проектов вроде Altlayer. Но, нужно понимать и принимать теоретические риски бритья от подобного связывания. Я, как и везде, не делаю всё в одном ключе, а диверсифицирую, чтобы в случае бритья за что-то определенное, часть фермы под этот критерий не попадала.
+
+<code class="block">Так же, важно оставлять на акках по 0.1 YT, во первых для того, чтобы не побрили на дроп, а во вторых, чтобы фармить и поинты и ранги. Поэтому, даже если вы раскидываете на бомжей с одного акка или переливаете стек YT с одного на другой - оптимальнее будет сразу раскинуть по 0.1 YT.</code>
+
+Итак, для короткого [YT eETH](<a href="https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output</a>) в Арб, сейчас отличная твх - 1 к 29.9, правда ликвидности для покупки на 1 ЕТН не хватает, но для бомжей с 0.1 в самый раз.
+
+Так же, можно делать часть бомжей через короткий [Renzo](<a href="https://app.pendle.finance/trade/markets/0xde715330043799d7a80249660d1e6b61eb3713b3/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xde715330043799d7a80249660d1e6b61eb3713b3/swap?view=yt&amp;chain=ethereum&amp;py=output</a>), при текущей твх 1 к 28.4, но тут конечно и твх чуть хуже и есть еще доп минус в виде комсы в сети эфира.
+
+Позднее так же будет сделан FAQ и закреп для ветки <a href="https://discord.com/channels/829331298878750771/1206641144402935879" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1206641144402935879</a>.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt; &lt;@&amp;975739898936037408&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">🔥</span><span class="count">39</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">4</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">04/04/2024, 05:24:08</span></h2><div class="message"><p><b>Ether.fi починили отображение поинтов и рангов для StakeRank</b>
+
+Теперь можно зайти в [портфолио](<a href="https://app.ether.fi/portfolio" target="_blank" rel="noreferrer">https://app.ether.fi/portfolio</a>) и посмотреть на свой ранг и буст. Ether.fi поинты отображаются корректно, с 10х расчетом.
+
+Условия остались [прежними](<a href="https://discord.com/channels/829331298878750771/1219198504430211122/1220984805873942578" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1219198504430211122/1220984805873942578</a>): всего 8 рангов, с бустами от 1х до 2х, которые повышаются каждые 100 часов.
+
+Поинты от Liquid начисляются, но пока не отображаются в портфолио. Это пофиксят в течении 24-48 часов и ранг будет отображаться корректно.
+
+<code class="block">Для любителей получать РО напомню, что не нужно задавать вопросы в чате касательно того, что у вас где-то не отображаются поинты. Это временные баги которые скоро пофиксят.</code>
+
+Твх для [длинных](<a href="https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output</a>) YT eETH на данный не очень, 1 к 12.84 ($259), нужно ловить просадки.
+Но если вы еще не начинали фармить и у вас не 1 ЕТН на всё про всё и вы готовы докупать позднее, то можно взять и сейчас.
+
+[Короткие](<a href="https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output&amp;chart=price" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output&amp;chart=price</a>) YT eETH достигли потолка своей цены и теперь, в основном, будут только падать.
+Не смотря на это, бомжей на 0.1+ ЕТН через них все еще можно делать. При текущей твх 1 к 34.17, за оставшиеся 20 дней вы заработаете ~1.6к EL поинтов.
+Посты по бомжам:
+<a href="https://discord.com/channels/829331298878750771/1219198504430211122/1220926448462729276" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1219198504430211122/1220926448462729276</a>
+<a href="https://discord.com/channels/829331298878750771/1219198504430211122/1223132054477082734" target="_blank" rel="noreferrer">https://discord.com/channels/829331298878750771/1219198504430211122/1223132054477082734</a>
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt; &lt;@&amp;975739898936037408&gt;</p><a href="https://cdn.discordapp.com/attachments/1219198504430211122/1225269647423701065/image.png?ex=66208448&amp;is=660e0f48&amp;hm=d28a02430519cc677476ac3d1efa8dd19a61baa693964565ca6de23ffec9ed83&amp;" class="embed download">Download image.png?ex=66208448&amp;is=660e0f48&amp;hm=d28a02430519cc677476ac3d1efa8dd19a61baa693964565ca6de23ffec9ed83&amp;</a></div><div class="reactions"><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">44</span></span><span class="reaction-wrapper"><span class="reaction-emoji">👍</span><span class="count">9</span></span></div></div></div></div><div><div class="reply-message reply-message-with-avatar"></div><div class="avatar-wrapper"><div class="avatar"><img src="./Discord Offline History_files/74090f8b2fd915eab26823f97f35a5a4.webp"></div><div><h2><strong class="username" title="#0">feeeniqs</strong><span class="info time">04/04/2024, 10:47:53</span><span class="info edited">Edited 04/04/2024, 10:59:02</span></h2><div class="message"><p><b>Переливаюсь из YT Ethena</b>
+
+Не нахожу для себя причин фармить в заведомо менее профитных пулах, которые, к тому же, будут продолжать увеличивать и размывать доходность.
+
+Как раз по этому случаю в длинном [YT eETH](<a href="https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xf32e58f92e60f4b0a37a69b95d642a471365eae8/swap?view=yt&amp;chain=ethereum&amp;py=output</a>) сейчас твх лучше, чем была 4 часа назад, когда я писал предыдущий пост - 1 к 13.45.
+
+На всякий случай для коротких [YT eETH](<a href="https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output&amp;chart=price" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xe11f9786b06438456b044b3e21712228adcaa0d1/swap?view=yt&amp;chain=arbitrum&amp;py=output&amp;chart=price</a>) сейчас тоже лучше твх - 1 к 39.9.
+
+<code class="block">Так же, сейчас подходящий газ, и если вы будете следовать моему примеру и выводить из YT USDe, то делайте это сразу в ETH, чтобы свапнуть дальше без апрува. На всякий случай еще увеличьте слиппейдж (нажмите на шестеренку вверху справа) до 1-2%.</code>
+
+Хотел еще докупить короткие [YT ezETH](<a href="https://app.pendle.finance/trade/markets/0xde715330043799d7a80249660d1e6b61eb3713b3/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xde715330043799d7a80249660d1e6b61eb3713b3/swap?view=yt&amp;chain=ethereum&amp;py=output</a>), сейчас они по 1 к 36.5 , но там закончилась ликвидность.
+
+Дополнительно хочу взять [YT ezETH Zircuit](<a href="https://app.pendle.finance/trade/markets/0xd7e0809998693fd87e81d51de1619fd0ee658031/swap?view=yt&amp;chain=ethereum&amp;py=output" target="_blank" rel="noreferrer">https://app.pendle.finance/trade/markets/0xd7e0809998693fd87e81d51de1619fd0ee658031/swap?view=yt&amp;chain=ethereum&amp;py=output</a>), но подожду лучшую твх. Хотя в общем то можно и лимитку поставить.
+
+&lt;@&amp;829341057190723595&gt; &lt;@&amp;1196944878505054258&gt; &lt;@&amp;975739898936037408&gt;</p></div><div class="reactions"><span class="reaction-wrapper"><img src="./Discord Offline History_files/953492286572998666.png" alt=":thinksmart1:" title=":thinksmart1:" class="reaction-emoji-custom"><span class="count">43</span></span><span class="reaction-wrapper"><span class="reaction-emoji">❤️</span><span class="count">7</span></span><span class="reaction-wrapper"><img src="./Discord Offline History_files/1008389734650875965.png" alt=":20:" title=":20:" class="reaction-emoji-custom"><span class="count">2</span></span><span class="reaction-wrapper"><img src="./Discord Offline History_files/1008389725708623985.gif" alt=":14:" title=":14:" class="reaction-emoji-custom"><span class="count">2</span></span><span class="reaction-wrapper"><span class="reaction-emoji">🤝</span><span class="count">2</span></span></div></div></div></div></div>
+    </div>
+    
+    <div id="modal" class="">
+      <div id="overlay"></div>
+      <div id="dialog" style="width: 560px; margin-left: -280px;"></div>
+    </div>
+  
+
+</body></html>
